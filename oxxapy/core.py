@@ -9,81 +9,14 @@ See README.rst for more info.
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 from warnings import warn
-from xml.etree import ElementTree
 
 from .exceptions import (
     OxxapyTransportError, OxxapyTransactionError)
+from .response import OxxapyResponse
 
 
 # url?apiuser=USER&apipassword=PASS&command=CMD[&test=Y]
 API_URL = 'https://api.oxxa.com/command.php'
-
-
-class _XmlResponse:
-    def __init__(self, binstr, req):
-        self._root = ElementTree.fromstring(binstr)
-        self.orig_req = req
-
-    def _parse(self):
-        """
-        Return inner <order/> from outer <channel/> as OxxapyOrder
-        """
-        if self._root.tag == 'channel':
-            children = self._root.getchildren()
-            if len(children) == 1 and children[0].tag == 'order':
-                return OxxapyOrder(children[0], req=self.orig_req)
-        raise NotImplementedError()
-
-    def __str__(self):
-        from xml.dom import minidom
-        binstr = ElementTree.tostring(self._root)
-        return minidom.parseString(binstr).toprettyxml(indent='  ')
-
-    def __repr__(self):
-        return '<_XmlResponse to="{}", """{}""">'.format(self.orig_req, self)
-
-    @classmethod
-    def _unmarshal_bool(cls, val):
-        assert val in ('TRUE', 'FALSE'), val
-        return val == 'TRUE'
-
-    @classmethod
-    def _unmarshal_bool_or_pending(cls, val):
-        if val == 'PENDING':
-            return None
-        return cls._unmarshal_bool(val)
-
-
-class OxxapyOrder(_XmlResponse):
-    def __init__(self, root, req):
-        self._root = root
-        self.orig_req = req
-
-        self.order_id = int(self._root.findtext('order_id'))
-        self._status_code = self._root.findtext('status_code')
-        self._status_description = self._root.findtext('status_description')
-        self._order_complete = self._unmarshal_bool_or_pending(
-            self._root.findtext('order_complete'))
-        self.done = self._unmarshal_bool(self._root.findtext('done'))
-
-    @property
-    def status(self):
-        """
-        Get (success, status_int, status_message) tuple
-        """
-        if self._status_code.startswith('XMLOK'):
-            return (
-                True, int(self._status_code[5:].lstrip()),
-                self._status_description)
-        elif self._status_code.startswith('XMLERR'):
-            return (
-                False, int(self._status_code[6:].lstrip()),
-                self._status_description)
-        raise NotImplementedError(self._status_code)
-
-    def is_order_complete(self, status):
-        assert status in (False, True, None), status  # 'false, true, pending'
-        return self._order_complete is status
 
 
 class OxxapyRequest:
@@ -99,6 +32,8 @@ class OxxapyRequest:
             if isinstance(v, str):
                 pass
             elif isinstance(v, bool):
+                # FIXME: this may be problematic if other fields are boolean
+                # but want a TRUE/FALSE instead..
                 send_params[k] = ('Y' if v else 'N')
             else:
                 assert False, f'unexpected non-string {k}={v}'
@@ -156,7 +91,7 @@ class OxxapyCore:
             raise OxxapyTransportError(
                 resp.status, resp.reason, req=req, binresp=data)
         try:
-            response = _XmlResponse(data, req)._parse()
+            response = OxxapyResponse.from_binstr(data, req).extract_order()
         except Exception as e:
             raise OxxapyTransportError(
                 resp.status, str(e), req=req, binresp=data)

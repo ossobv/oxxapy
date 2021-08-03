@@ -63,22 +63,40 @@ Example API call response:
     </order>
   </channel>
 
-------------------------------------------------------------------------
-
-Preferred API call syntax:
-
-  api = TheApi(...)
-
-  api.direct('domain_check', sld='example', tld='com')
-
-  api.domain.list()
-  api.domain('example.com').autorenew(True)
-  api.domain('example.com').info()
-
 """
 from .core import OxxapyCore
-from .domain import OxxapyDomainManager
+from .domain import OxxapyDomains
 
 
 class Oxxapy(OxxapyCore):
-    domain = OxxapyDomainManager.as_property()
+    """
+    OXXA API interface
+
+    Prefer using the managers (like .domains) that provide a higher
+    level interface.
+
+    Example:
+
+        api = Oxxapy(...)
+
+        for domain in api.domains.all():
+            print(domain)
+
+    You can fall to direct API calls using the raw() method, if a higher
+    level interface is missing. See the API docs (pdf) for more details.
+    But remember that the return value (OxxapyOrder) might not not be
+    very stable yet.
+    """
+    domains = OxxapyDomains.as_property()
+
+    def raw(self, command, **params):
+        """
+        Do a raw API call directly
+
+        Example:
+
+            api.raw('domain_inf', sld='example', tld='com')
+
+        Return value is an OxxapyOrder instance.
+        """
+        return self._call(command, **params)

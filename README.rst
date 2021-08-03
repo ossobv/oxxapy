@@ -10,7 +10,16 @@ Example usage
 
     api = Oxxapy(os.environ['OXXAPY_USER'], os.environ['OXXAPY_PASS'])
 
-    api.domain.list()
+    # Not preferred interface:
+    orderobj = api.raw('domain_check', sld='example', tld='com')
 
-    api.domain('example.com').check()
-    api.domain('example.com').autorenew(True)
+    # Preferred interface:
+    for domain in api.domains.all():
+        print(domain)
+
+        if not domain.autorenew:
+            domain.set_autorenew(True)
+
+    # Get a domain directly:
+    api.domains.get('example.com').set_autorenew(True)
+    assert not api.domains.get('example.com').is_free()
