@@ -34,16 +34,38 @@ class OxxapyDomain:
           <usetrustee>N</usetrustee>
         </domain>
         """
-        domain = xml_domain.get_str_value('domainname')
-        ret = cls(core, domain)
-        ret._autorenew = xml_domain.get_bool_value('autorenew')
-        # FIXME: extract more..
+        name = xml_domain.get_str_value('domainname')
+        ret = cls(core, name)
+        ret._update_from_xml(xml_domain)
         return ret
 
-    def __init__(self, core, domain):
+    def __init__(self, core, name):
         self._core = core
-        self._domain = domain
-        self._sld, self._tld = domain.split('.', 1)  # "co.uk" might be tld
+        self._name = name
+        self._sld, self._tld = name.split('.', 1)  # "co.uk" might be tld
+
+    def __eq__(self, other):
+        return self._name == other._name
+
+    def __lt__(self, other):
+        if self._name < other._name:
+            return True
+        return False
+
+    def _update_from_xml(self, xml_domain):
+        # IDs
+        self._nsgroup = xml_domain.get_str_value('nsgroup')
+        self._reg_c = xml_domain.get_str_value('identity-registrant')
+        self._admin_c = xml_domain.get_str_value('identity-admin')
+        self._tech_c = xml_domain.get_str_value('identity-tech')
+        self._bill_c = xml_domain.get_str_value('identity-billing')
+        # Renew
+        self._autorenew = xml_domain.get_bool_value('autorenew')
+        self._begin_date = xml_domain.get_date_value('start_date')
+        self._end_date = xml_domain.get_date_value('expire_date')
+
+    def _update(self):
+        raise NotImplementedError()
 
     def _call(self, command, **params):
         return self._core._call(
@@ -53,9 +75,38 @@ class OxxapyDomain:
         return f'<OxxapyDomain({self._domain})>'
 
     @property
+    def name(self):
+        return self._name
+
+    @property
     def autorenew(self):
-        # FIXME: if not set, then fetch
+        if not hasattr(self, '_autorenew'):
+            self._update()
         return self._autorenew
+
+    @property
+    def reg_c(self):
+        if not hasattr(self, '_reg_c'):
+            self._update()
+        return self._reg_c
+
+    @property
+    def admin_c(self):
+        if not hasattr(self, '_admin_c'):
+            self._update()
+        return self._admin_c
+
+    @property
+    def tech_c(self):
+        if not hasattr(self, '_tech_c'):
+            self._update()
+        return self._tech_c
+
+    @property
+    def bill_c(self):
+        if not hasattr(self, '_bill_c'):
+            self._update()
+        return self._bill_c
 
     def is_free(self):
         "Return whether the domain is free (True) or not (False)"
@@ -97,7 +148,7 @@ class OxxapyDomains(Manager):
             autorenew=None, lock=None, expire_date=None, status=None,
             status_days=None):
         "Get all domains that fit the filter expression"
-        params = {}
+        params = {'records': -1}
 
         if domain is None and tld is not None:
             params['tld'] = tld
@@ -109,8 +160,10 @@ class OxxapyDomains(Manager):
         elif domain is not None and tld is not None:
             raise NotImplementedError('do not use both tld and domain')
 
-        assert nsgroup is None, NotImplemented
-        assert identity is None, NotImplemented
+        if nsgroup is not None:
+            params['nsgroup'] = nsgroup
+        if identity is not None:
+            params['identity'] = identity
 
         if autorenew is not None:
             assert autorenew in (True, False), autorenew
@@ -150,6 +203,9 @@ class OxxapyDomains(Manager):
         # > - DAYS (optioneel) Zoekwaarde die te combineren is met
         # >   status parameters.
         resp = self._core._call('domain_list', **params)
-        domains = resp.get_children('domains')[0]
-        # XXX: broken
-        return resp
+        details = resp.extract_details()
+        ret = []
+        for domain in details.get_children('domain'):
+            ret.append(OxxapyDomain.from_xml(self._core, domain))
+        ret.sort()
+        return ret

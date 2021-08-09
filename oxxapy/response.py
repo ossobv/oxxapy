@@ -6,6 +6,7 @@ Copyright (C) 2021 Walter Doekes, OSSO B.V.
 
 See README.rst for more info.
 """
+from datetime import date
 from xml.etree import ElementTree
 
 from .exceptions import OxxapyApplicationError
@@ -22,7 +23,8 @@ class _OxxapyXml:
 
     def get_date_value(self, tagname):
         "Return date contents of immediate child with name tagname"
-        return NotImplemented
+        yyyy, mm, dd = [int(i) for i in self.get_str_value(tagname).split('-')]
+        return date(yyyy, mm, dd)
 
     def get_int_value(self, tagname):
         "Return int contents of immediate child with name tagname"
@@ -32,17 +34,10 @@ class _OxxapyXml:
         "Return string contents of immediate child with name tagname"
         return self._root.findtext(tagname)
 
-#    def get_child(self, tagname):
-#        "Return new _OxxapyXml with this only child"
-#        children = self._root.findall(tagname)
-#        if len(children) != 1:
-#            raise OxxapyApplicationError(
-#                0, '{} {} children'.format(len(children), tagname),
-#                req=self.orig_req, resp=self)
-#        return children[0]
-
     def get_children(self, tagname, wrapper_cb=None):
         "Return a list of children passed through wrapper_cb"
+        wrapper_cb = wrapper_cb or _OxxapyXml
+
         ret = []
         for child in self._root.findall(tagname):
             if wrapper_cb:
@@ -90,9 +85,8 @@ class OxxapyResponse(_OxxapyXml):
 
 
 class OxxapyOrder(_OxxapyXml):
-    def __init__(self, root, req):
-        self._root = root
-        self.orig_req = req
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
         self.order_id = int(self._root.findtext('order_id'))
         self._status_code = self._root.findtext('status_code')
@@ -119,3 +113,15 @@ class OxxapyOrder(_OxxapyXml):
     def is_order_complete(self, status):
         assert status in (False, True, None), status  # 'false, true, pending'
         return self._order_complete is status
+
+    def extract_details(self):
+        """
+        Return inner <details/> as OxxapyDetails
+        """
+        details = self._root.findall('details')
+        assert len(details) == 1, details  # OxxapyApplicationError?
+        return OxxapyDetails(details[0], req=self.orig_req)
+
+
+class OxxapyDetails(_OxxapyXml):
+    pass

@@ -35,6 +35,8 @@ class OxxapyRequest:
                 # FIXME: this may be problematic if other fields are boolean
                 # but want a TRUE/FALSE instead..
                 send_params[k] = ('Y' if v else 'N')
+            elif isinstance(v, int):
+                send_params[k] = str(v)
             else:
                 assert False, f'unexpected non-string {k}={v}'
         send_params = dict(
