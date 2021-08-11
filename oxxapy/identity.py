@@ -12,7 +12,7 @@ from .manager import Manager
 class OxxapyIdentity:
     "Bound identity manager"
     @classmethod
-    def from_xml(cls, core, xml_handle):
+    def from_xml(cls, core, xml_identity):
         """
         Turn _OxxapyXml into identity with prefilled values
 
@@ -23,9 +23,9 @@ class OxxapyIdentity:
           <name>Doe, John</name>
         </identity>
         """
-        handle = xml_handle.get_str_value('handle')
+        handle = xml_identity.get_str_value('handle')
         ret = cls(core, handle)
-        ret._update_from_xml(xml_handle)
+        ret._update_from_xml(xml_identity)
         return ret
 
     def __init__(self, core, handle):
@@ -43,18 +43,18 @@ class OxxapyIdentity:
             return True
         return False
 
-    def _update_from_xml(self, xml_handle):
+    def _update_from_xml(self, xml_identity):
         # FIXME: more fields..
-        self._alias = xml_handle.get_str_value('alias')
+        self._alias = xml_identity.get_str_value('alias')
 
-        lastname_firstname = xml_handle.get_str_value('name')
+        lastname_firstname = xml_identity.get_str_value('name')
         if ', ' in lastname_firstname:
             self._lastname, self._firstname = lastname_firstname.split(
                 ', ', 1)
         else:
             self._lastname, self._firstname = lastname_firstname, ''
 
-        self._company_name = xml_handle.get_str_value('company_name')
+        self._company_name = xml_identity.get_str_value('company_name')
 
     def _update(self):
         raise NotImplementedError()
