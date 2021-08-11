@@ -72,7 +72,7 @@ class OxxapyDomain:
             command, tld=self._tld, sld=self._sld, **params)
 
     def __repr__(self):
-        return f'<OxxapyDomain({self._domain})>'
+        return f'<OxxapyDomain({self._name})>'
 
     @property
     def name(self):

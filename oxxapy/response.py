@@ -7,6 +7,7 @@ Copyright (C) 2021 Walter Doekes, OSSO B.V.
 See README.rst for more info.
 """
 from datetime import date
+from decimal import ConversionSyntax, Decimal
 from xml.etree import ElementTree
 
 from .exceptions import OxxapyApplicationError
@@ -23,16 +24,56 @@ class _OxxapyXml:
 
     def get_date_value(self, tagname):
         "Return date contents of immediate child with name tagname"
-        yyyy, mm, dd = [int(i) for i in self.get_str_value(tagname).split('-')]
-        return date(yyyy, mm, dd)
+        try:
+            yyyy, mm, dd = [
+                int(i) for i in self.get_str_value(tagname).split('-')]
+
+            # In some fields we get DD-MM-YYYY and in others we get YYYY-MM-DD.
+            # Swap them if necessary.
+            if 1900 <= dd <= 9999 and 1 <= yyyy <= 31:
+                dd, yyyy = yyyy, dd  # swap
+
+            ret = date(yyyy, mm, dd)
+            if ret.year < 1900 or ret.year > 9999:
+                raise ValueError
+
+        except ValueError:
+            raise OxxapyApplicationError(
+                0, 'bad date in {}'.format(tagname), req=self.orig_req,
+                resp=self)
+
+        return ret
+
+    def get_decimal_value(self, tagname):
+        "Return decimal contents of immediate child with name tagname"
+        try:
+            return Decimal(self.get_str_value(tagname))
+        except ConversionSyntax:
+            raise OxxapyApplicationError(
+                0, 'bad decimal in {}'.format(tagname), req=self.orig_req,
+                resp=self)
 
     def get_int_value(self, tagname):
         "Return int contents of immediate child with name tagname"
-        return int(self.get_str_value(tagname))
+        try:
+            return int(self.get_str_value(tagname))
+        except ValueError:
+            raise OxxapyApplicationError(
+                0, 'bad integer in {}'.format(tagname), req=self.orig_req,
+                resp=self)
 
     def get_str_value(self, tagname):
         "Return string contents of immediate child with name tagname"
         return self._root.findtext(tagname)
+
+    def get_child(self, tagname, wrapper_cb=None):
+        "Return the one child"
+        children = self.get_children(tagname, wrapper_cb)
+        if len(children) != 1:
+            raise OxxapyApplicationError(
+                0, 'non-1 children of {}'.format(tagname), req=self.orig_req,
+                resp=self)
+        return children[0]
 
     def get_children(self, tagname, wrapper_cb=None):
         "Return a list of children passed through wrapper_cb"
