@@ -62,8 +62,25 @@ class OxxapyReseller:
         return self._handle
 
 
-# A special (immutable) NONE reseller.
-OxxapyReseller.NONE = OxxapyReseller(core=None, handle=None)
+class OxxapyResellerNone(OxxapyReseller):
+    """
+    A special (immutable) NONE reseller
+
+    We use this instead of None because the None argument signifies "unset",
+    whereas we want to have No-Reseller as an option.
+    """
+    def __init__(self):
+        # NOTE: We set handle to the empty string, because that is what we use
+        # when calling domain_upd when unsetting the identity-reseller.
+        # NOTE: However, it appears that it is impossible to unset a Reseller
+        # at this time.
+        super().__init__(core=None, handle='')
+
+    def __repr__(self):
+        return f'<OxxapyReseller[NONE]>'
+
+
+OxxapyReseller.NONE = OxxapyResellerNone()
 
 
 class OxxapyResellers(Manager):
@@ -115,5 +132,5 @@ class OxxapyResellers(Manager):
         return ret
 
     def none(self):
-        "Return the NONE reseller"
+        "Return the NONE reseller, useful when filtering/unsetting"
         return OxxapyReseller.NONE
