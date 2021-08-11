@@ -17,7 +17,7 @@ class OxxapyDomain:
         """
         Turn _OxxapyXml into domain with prefilled values
 
-        <domain>
+        <domain><!-- domain_list -->
           <domainname>example.com</domainname>
           <nsgroup>RG0000000</nsgroup>
           <identity-registrant>VQ0000000</identity-registrant>
@@ -33,6 +33,22 @@ class OxxapyDomain:
           <last_renew_date>2021-06-17 00:17:37</last_renew_date>
           <usetrustee>N</usetrustee>
         </domain>
+
+        or
+
+        <details><!-- domain_inf -->
+          <identity-registrant>VQ0000000</identity-registrant>
+          <identity-admin>VQ0000000</identity-admin>
+          <identity-billing>MH0000000</identity-billing>
+          <identity-tech>MH0000000</identity-tech>
+          <identity-reseller>KULB12345</identity-reseller>
+          <nsgroup>RG0000000</nsgroup>
+          <expire_date>01-10-2021</expire_date>
+          <notice_date>2021-10-01</notice_date>
+          <autorenew>Y</autorenew>
+          <usetrustee>N</usetrustee>
+          <dnssec>Y</dnssec>
+        </details>
         """
         name = xml_domain.get_str_value('domainname')
         ret = cls(core, name)
@@ -62,13 +78,19 @@ class OxxapyDomain:
         self._admin_c = xml_domain.get_str_value('identity-admin')
         self._tech_c = xml_domain.get_str_value('identity-tech')
         self._bill_c = xml_domain.get_str_value('identity-billing')
+
         # Renew
         self._autorenew = xml_domain.get_bool_value('autorenew')
-        self._begin_date = xml_domain.get_date_value('start_date')
-        self._end_date = xml_domain.get_date_value('expire_date')
+        self._expire_date = xml_domain.get_date_value('expire_date')
+
+        # DNSSEC (only in domain_inf)
+        try:
+            self._dnssec = xml_domain.get_bool_value('dnssec')
+        except OxxapyApplicationError:
+            pass
 
     def _update(self):
-        raise NotImplementedError()
+        self._update_from_xml(self._call('domain_inf').get_child('details'))
 
     def _call(self, command, **params):
         return self._core._call(
@@ -161,7 +183,7 @@ class OxxapyDomain:
         # >   Domeinnaam reeds ingesteld met dit tech profiel
         # > </status_description>
         # So, don't do that.
-        from oxxapy.identity import OxxapyIdentity
+        from .identity import OxxapyIdentity
         params = {}
 
         if admin_c is not None:
@@ -193,7 +215,7 @@ class OxxapyDomain:
             self._bill_c = params['identity-billing']
 
     def _set_identity(self, field, identity):
-        from oxxapy.identity import OxxapyIdentity
+        from .identity import OxxapyIdentity
         assert isinstance(identity, OxxapyIdentity), (type(identity), identity)
         orderobj = self._call('domain_upd', **{field: identity.handle})
         assert orderobj.status[0]
