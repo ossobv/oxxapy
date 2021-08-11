@@ -66,6 +66,7 @@ Higher level interface, preferred:
 .. code-block:: python
 
     # Looping over filtered/searched results:
+    # BEWARE: domains.filter()/all() returns an iterable!
     for dom in api.domains.filter(identity='VQHQ99548'):
         autorenew = 'Y' if dom.autorenew else 'N'
         print(
@@ -88,6 +89,7 @@ And, how about listing all domains per owner:
     api.identities.all()
 
     # Get all domains that have autorenew enabled:
+    # BEWARE: domains.filter()/all() returns an iterable!
     domains = api.domains.filter(autorenew=True)
 
     # Sort them by reg-c:

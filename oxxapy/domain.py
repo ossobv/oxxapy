@@ -280,14 +280,14 @@ class OxxapyDomains(Manager):
         return OxxapyDomain(self._core, domain)
 
     def all(self):
-        "Get all domains"
+        "Get all domains AS AN ITERABLE"
         return self.filter()
 
     def filter(
             self, domain=None, tld=None, nsgroup=None, identity=None,
             autorenew=None, lock=None, expire_date=None, status=None,
             status_days=None, reseller=None):
-        "Get all domains that fit the filter expression"
+        "Get all domains that fit the filter expression AS AN ITERABLE"
         params = {'records': -1}
 
         if domain is None and tld is not None:
