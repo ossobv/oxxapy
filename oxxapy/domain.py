@@ -138,6 +138,74 @@ class OxxapyDomain:
         # > het systeem wordt verlengd.
         return self._call('autorenew', autorenew=boolean)
 
+    def set_reg_c(self, identity):
+        "Change owner/reg_c/identity-registrant"
+        raise NotImplementedError('''\
+            Let op: een wijziging van de IDENTITY-REGISTRANT wordt
+            opgevat als een domeinnaam overdracht naar een nieuwe
+            houder. Afhankelijk van de domeinnaam extensie kan de
+            registry hiervoor kosten in rekening brengen welke worden
+            doorberekend.''')
+        self._reg_c = self._set_identity('identity-registrant', identity)
+
+    def set_c(self, admin_c=None, tech_c=None, bill_c=None):
+        "Change admin_c + tech_c + bill_c at once"
+        # It is sometimes needed to set multiple identities at once:
+        # > Het domein bevat na deze update nog migratie profielen, je
+        # > kan pas updaten wanneer alle migratie profielen zijn
+        # > aangepast.
+        #
+        # If you attempt to set something to an already set handle, you'll get:
+        # > <status_code>XMLERR 76</status_code>
+        # > <status_description>
+        # >   Domeinnaam reeds ingesteld met dit tech profiel
+        # > </status_description>
+        # So, don't do that.
+        from oxxapy.identity import OxxapyIdentity
+        params = {}
+
+        if admin_c is not None:
+            assert isinstance(admin_c, OxxapyIdentity), (
+                type(admin_c), admin_c)
+            params['identity-admin'] = admin_c.handle
+
+        if tech_c is not None:
+            assert isinstance(tech_c, OxxapyIdentity), (
+                type(tech_c), tech_c)
+            params['identity-tech'] = tech_c.handle
+
+        if bill_c is not None:
+            assert isinstance(bill_c, OxxapyIdentity), (
+                type(bill_c), bill_c)
+            params['identity-billing'] = bill_c.handle
+
+        if len(params) == 0:
+            raise TypeError('set_c needs at least one argument')
+
+        orderobj = self._call('domain_upd', **params)
+        assert orderobj.status[0]
+
+        if 'identity-admin' in params:
+            self._admin_c = params['identity-admin']
+        if 'identity-tech' in params:
+            self._tech_c = params['identity-tech']
+        if 'identity-billing' in params:
+            self._bill_c = params['identity-billing']
+
+    def _set_identity(self, field, identity):
+        from oxxapy.identity import OxxapyIdentity
+        assert isinstance(identity, OxxapyIdentity), (type(identity), identity)
+        orderobj = self._call('domain_upd', **{field: identity.handle})
+        assert orderobj.status[0]
+        return identity.handle
+
+    def set_reseller(self, reseller):
+        "Change or unset (None) reseller"
+        raise NotImplementedError(
+            'XXX: no Reseller objects yet. And how to we unset a reseller?')
+        return self._call(
+            'domain_upd', **{'identity-reseller': reseller.handle})
+
 
 class OxxapyDomains(Manager):
     "Unbound domain manager"

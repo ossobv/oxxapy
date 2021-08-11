@@ -104,3 +104,45 @@ And, how about listing all domains per owner:
     # ACME Inc  # HNDL1234
     # - example.com
     # - example.org
+
+And, fixing migration identities:
+
+.. code-block:: python
+
+    # Check and set bill_c on all domains to a single bill_c (MHFQ12345),
+    # and make reg_c and admin_c equal:
+    osso_c = api.identities.get('MHFQ12345')
+    for domain in domains:
+        if domain.reg_c != domain.admin_c or (
+                domain.tech_c != osso_c or domain.bill_c != osso_c):
+            print(
+                '1>', domain.reg_c, domain.admin_c,
+                domain.tech_c, domain.bill_c, domain)
+
+            # First, we must fix any migration profiles:
+            params = {}
+            if domain.admin_c.handle == 'IDEN12345':
+                params['admin_c'] = domain.reg_c
+            if domain.tech_c.handle == 'IDEN12345':
+                params['tech_c'] = osso_c
+            if domain.bill_c.handle == 'IDEN12345':
+                params['bill_c'] = osso_c
+
+            if params:
+                domain.set_c(**params)
+                print('updated *_c', domain, params)
+
+            # Secondly, we can update individual fields if needed:
+            # admin_c <== reg_c
+            if not (domain.reg_c == domain.admin_c):
+                domain.set_c(admin_c=domain.reg_c)
+            # tech_c <== osso_c
+            if not (domain.tech_c == osso_c):
+                domain.set_c(tech_c=osso_c)
+            # bill_c <== osso_c
+            if not (domain.bill_c == osso_c):
+                domain.set_c(bill_c=osso_c)
+
+            print(
+                '2>', domain.reg_c, domain.admin_c,
+                domain.tech_c, domain.bill_c, domain)
