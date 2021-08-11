@@ -66,6 +66,8 @@ Example API call response:
 """
 from .core import OxxapyCore
 from .domain import OxxapyDomains
+from .identity import OxxapyIdentities
+from .nsgroup import OxxapyNsgroups
 
 
 class Oxxapy(OxxapyCore):
@@ -88,6 +90,8 @@ class Oxxapy(OxxapyCore):
     very stable yet.
     """
     domains = OxxapyDomains.as_property()
+    identities = OxxapyIdentities.as_property()
+    nsgroups = OxxapyNsgroups.as_property()
 
     def raw(self, command, **params):
         """

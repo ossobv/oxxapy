@@ -70,6 +70,7 @@ class OxxapyCore:
 
         self._apiurl = API_URL
         self._username, self._password = username, password
+        self._caches = {}
 
     def _call(self, command, **params):
         resp = self._xmlcall(command, **params)
@@ -98,3 +99,22 @@ class OxxapyCore:
             raise OxxapyTransportError(
                 resp.status, str(e), req=req, binresp=data)
         return response
+
+    def _cache_clear(self, type_):
+        type_key = type_.__name__
+        if type_key in self._caches:
+            del self._caches[type_key]
+
+    def _cache_get(self, type_, id_, create_func):
+        type_key = type_.__name__
+        if type_key not in self._caches:
+            self._caches[type_key] = {}
+        if id_ not in self._caches[type_key]:
+            self._caches[type_key][id_] = create_func()
+        return self._caches[type_key][id_]
+
+    def _cache_set(self, type_, id_, value):
+        type_key = type_.__name__
+        if type_key not in self._caches:
+            self._caches[type_key] = {}
+        self._caches[type_key][id_] = value

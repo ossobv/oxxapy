@@ -44,6 +44,9 @@ class OxxapyDomain:
         self._name = name
         self._sld, self._tld = name.split('.', 1)  # "co.uk" might be tld
 
+    def __hash__(self):
+        return hash(self._name)
+
     def __eq__(self, other):
         return self._name == other._name
 
@@ -88,25 +91,31 @@ class OxxapyDomain:
     def reg_c(self):
         if not hasattr(self, '_reg_c'):
             self._update()
-        return self._reg_c
+        return self._core.identities.get(self._reg_c)
 
     @property
     def admin_c(self):
         if not hasattr(self, '_admin_c'):
             self._update()
-        return self._admin_c
+        return self._core.identities.get(self._admin_c)
 
     @property
     def tech_c(self):
         if not hasattr(self, '_tech_c'):
             self._update()
-        return self._tech_c
+        return self._core.identities.get(self._tech_c)
 
     @property
     def bill_c(self):
         if not hasattr(self, '_bill_c'):
             self._update()
-        return self._bill_c
+        return self._core.identities.get(self._bill_c)
+
+    @property
+    def nsgroup(self):
+        if not hasattr(self, '_nsgroup'):
+            self._update()
+        return self._core.nsgroups.get(self._nsgroup)
 
     def is_free(self):
         "Return whether the domain is free (True) or not (False)"

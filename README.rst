@@ -56,3 +56,28 @@ Example usage
     # Or, also preferred, act on domains directly:
     api.domains.get('example.com').set_autorenew(True)
     assert not api.domains.get('example.com').is_free()
+
+And, how about listing all domains per owner:
+
+.. code-block:: python
+
+    # Prefetch identities:
+    api.identities.all()
+
+    # Get all domains that have autorenew enabled:
+    domains = api.domains.filter(autorenew=True)
+
+    # Sort them by reg-c:
+    domains_by_regcs = defaultdict(list)
+    for domain in domains:
+        domains_by_regcs[domain.reg_c].append(domain)
+
+    # Print them in groups:
+    for regc, domains in domains_by_regcs.items():
+        print(regc._alias, ' #', regc.handle)
+        for domain in domains:
+            print('-', domain.name)
+        print()
+    # ACME Inc  # HNDL1234
+    # - example.com
+    # - example.org

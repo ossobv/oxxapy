@@ -64,7 +64,15 @@ class _OxxapyXml:
 
     def get_str_value(self, tagname):
         "Return string contents of immediate child with name tagname"
-        return self._root.findtext(tagname)
+        ret = self._root.findtext(tagname)
+        try:
+            if not isinstance(ret, str):
+                raise ValueError
+        except ValueError:
+            raise OxxapyApplicationError(
+                0, 'bad str ({!r}) in {}'.format(ret, tagname),
+                req=self.orig_req, resp=self)
+        return ret
 
     def get_child(self, tagname, wrapper_cb=None):
         "Return the one child"
