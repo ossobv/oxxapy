@@ -56,9 +56,16 @@ class OxxapyDomain:
         return ret
 
     def __init__(self, core, name):
+        name = name.lower()  # we compare against 'nl' below..
         self._core = core
         self._name = name
         self._sld, self._tld = name.split('.', 1)  # "co.uk" might be tld
+
+        # > Deze informatie zal getoond worden als reseller in de
+        # > WHOIS informatie van de SIDN (.NL).
+        # So, for non-NL domains, we won't bother.
+        if self._tld != 'nl':
+            self._reseller = None
 
     def __hash__(self):
         return hash(self._name)
@@ -88,6 +95,17 @@ class OxxapyDomain:
             self._dnssec = xml_domain.get_bool_value('dnssec')
         except OxxapyApplicationError:
             pass
+
+        # Reseller values (only in domain_inf)
+        # > Deze informatie zal getoond worden als reseller in de
+        # > WHOIS informatie van de SIDN (.NL).
+        # Don't bother for non-NL.
+        if self._tld == 'nl':
+            try:
+                self._reseller = (
+                    xml_domain.get_str_value('identity-reseller') or None)
+            except OxxapyApplicationError:
+                pass
 
     def _update(self):
         self._update_from_xml(self._call('domain_inf').get_child('details'))
@@ -138,6 +156,12 @@ class OxxapyDomain:
         if not hasattr(self, '_nsgroup'):
             self._update()
         return self._core.nsgroups.get(self._nsgroup)
+
+    @property
+    def reseller(self):
+        if not hasattr(self, '_reseller'):
+            self._update()
+        return self._core.resellers.get(self._reseller)
 
     def is_free(self):
         "Return whether the domain is free (True) or not (False)"
@@ -223,8 +247,25 @@ class OxxapyDomain:
 
     def set_reseller(self, reseller):
         "Change or unset (None) reseller"
-        raise NotImplementedError(
-            'XXX: no Reseller objects yet. And how to we unset a reseller?')
+        from .reseller import OxxapyReseller
+        if not isinstance(reseller, OxxapyReseller):
+            raise TypeError('reseller must be OxxapyReseller type')
+        if self._tld != 'nl':
+            # <order>
+            #   <order_id>123456789</order_id>
+            #   <command>domain_upd</command>
+            #   <sld>example</sld>
+            #   <tld>com</tld>
+            #   <status_code>XMLERR 53</status_code>
+            #   <status_description>
+            #     Er zijn geen nieuwe profielen opgegeven
+            #   </status_description>
+            #   <price>0</price>
+            #   <order_complete>FALSE</order_complete>
+            #   <done>TRUE</done>
+            # </order>
+            raise TypeError(
+                'trying to set a reseller on a non-NL domain will fail')
         return self._call(
             'domain_upd', **{'identity-reseller': reseller.handle})
 
@@ -245,7 +286,7 @@ class OxxapyDomains(Manager):
     def filter(
             self, domain=None, tld=None, nsgroup=None, identity=None,
             autorenew=None, lock=None, expire_date=None, status=None,
-            status_days=None):
+            status_days=None, reseller=None):
         "Get all domains that fit the filter expression"
         params = {'records': -1}
 
@@ -272,6 +313,11 @@ class OxxapyDomains(Manager):
         assert expire_date is None, NotImplemented
         assert status is None, NotImplemented
         assert status_days is None, NotImplemented
+
+        if reseller is not None:
+            from .reseller import OxxapyReseller
+            if not isinstance(reseller, OxxapyReseller):
+                raise TypeError('reseller must be OxxapyReseller type')
 
         # Variabelen:
         # - START (optioneel) Startveld van de lijstweergave (standaard = 0)
@@ -307,4 +353,11 @@ class OxxapyDomains(Manager):
         for domain in details.get_children('domain'):
             ret.append(OxxapyDomain.from_xml(self._core, domain))
         ret.sort()
-        return ret
+
+        # Return domains as iterable so we get immediate results.
+        for domain in ret:
+            # If we have to do post-processing, that may take some addition
+            # time.
+            if reseller is not None and domain.reseller != reseller:
+                continue
+            yield domain

@@ -68,6 +68,7 @@ from .core import OxxapyCore
 from .domain import OxxapyDomains
 from .identity import OxxapyIdentities
 from .nsgroup import OxxapyNsgroups
+from .reseller import OxxapyResellers
 
 
 class Oxxapy(OxxapyCore):
@@ -92,6 +93,7 @@ class Oxxapy(OxxapyCore):
     domains = OxxapyDomains.as_property()
     identities = OxxapyIdentities.as_property()
     nsgroups = OxxapyNsgroups.as_property()
+    resellers = OxxapyResellers.as_property()
 
     def raw(self, command, **params):
         """

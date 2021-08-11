@@ -146,3 +146,20 @@ And, fixing migration identities:
             print(
                 '2>', domain.reg_c, domain.admin_c,
                 domain.tech_c, domain.bill_c, domain)
+
+Setting all NL domains that have no reseller to our only reseller:
+
+.. code-block:: python
+
+    resellers = api.resellers.all()
+    for reseller in resellers:
+        print(reseller)
+    # reseller now holds last (and only relevant) reseller (to us)
+
+    no_reseller = api.resellers.none()  # the special NONE-reseller
+    domains = api.domains.filter(
+        reseller=no_reseller, autorenew=True, tld='nl')
+    for domain in domains:
+        assert domain.reseller == no_reseller, domain.reseller
+        print(domain, 'setting reseller to', reseller)
+        domain.set_reseller(reseller)
