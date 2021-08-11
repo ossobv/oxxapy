@@ -154,15 +154,3 @@ class OxxapyOrder(_OxxapyXml):
     def is_order_complete(self, status):
         assert status in (False, True, None), status  # 'false, true, pending'
         return self._order_complete is status
-
-    def extract_details(self):
-        """
-        Return inner <details/> as OxxapyDetails
-        """
-        details = self._root.findall('details')
-        assert len(details) == 1, details  # OxxapyApplicationError?
-        return OxxapyDetails(details[0], req=self.orig_req)
-
-
-class OxxapyDetails(_OxxapyXml):
-    pass

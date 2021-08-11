@@ -203,7 +203,7 @@ class OxxapyDomains(Manager):
         # > - DAYS (optioneel) Zoekwaarde die te combineren is met
         # >   status parameters.
         resp = self._core._call('domain_list', **params)
-        details = resp.extract_details()
+        details = resp.get_child('details')
         ret = []
         for domain in details.get_children('domain'):
             ret.append(OxxapyDomain.from_xml(self._core, domain))
