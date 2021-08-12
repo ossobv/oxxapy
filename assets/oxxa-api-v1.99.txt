@@ -507,7 +507,7 @@ Variabelen:
     -   CART_ID                   (verplicht)   ID nummer van het cart item.
 
 Voorbeeld:
-https://api.oxxa.com//command.php?apiuser=USER&apipassword=PASS&command=cart_get&cart_id=999
+https://api.oxxa.com/command.php?apiuser=USER&apipassword=PASS&command=cart_get&cart_id=999
 
 Uitvoer:
 <?xml version="1.0" encoding="ISO-8859-1" ?>
@@ -602,7 +602,7 @@ Variabelen:
     -   CART_ID                   (verplicht)   Cart_id van het item of ALL om de volledige cart aan te schaffen.
 
 Voorbeeld:
-https://api.oxxa.com//command.php?apiuser=USER&apipassword=PASS&command=cart_purchase&
+https://api.oxxa.com/command.php?apiuser=USER&apipassword=PASS&command=cart_purchase&
 cart_id=ALL
 
 Uitvoer:
@@ -1235,7 +1235,7 @@ Variabelen:
     -   TLD                       (verplicht)   Tld van de domeinnaam.
 
 Voorbeeld:
-https://api.oxxa.com//command.php?apiuser=USER&apipassword=PASS&command=domain_inf&tld=ORG&
+https://api.oxxa.com/command.php?apiuser=USER&apipassword=PASS&command=domain_inf&tld=ORG&
 sld=EXAMPLE
 
 Uitvoer:
@@ -1617,7 +1617,7 @@ Variabelen:
     -   NS_IP                     (verplicht)   Het IP adres wat toegevoegd moet worden aan de nameserver
 
 Voorbeeld:
-https://api.oxxa.com//command.php?apiuser=USER&apipassword=PASS&command=glue_add&ns_fqdn=ns
+https://api.oxxa.com/command.php?apiuser=USER&apipassword=PASS&command=glue_add&ns_fqdn=ns
 1.website.nl&ns_ip=192.168.0.1
 
 Uitvoer:
@@ -1743,7 +1743,7 @@ Variabelen:
     -   NS_IP                     (verplicht)   Het IP adres wat toegevoegd moet worden aan de nameserver
 
 Voorbeeld:
-https://api.oxxa.com//command.php?apiuser=USER&apipassword=PASS&command=glue_upd&ns_fqdn=ns
+https://api.oxxa.com/command.php?apiuser=USER&apipassword=PASS&command=glue_upd&ns_fqdn=ns
 1.website.nl&ns_ip=192.168.0.1
 
 Uitvoer:
@@ -1843,7 +1843,7 @@ Variabelen:
     -   IDENTITY                  (verplicht)   Handle van de te verwijderen identity.
 
 Voorbeeld:
-https://api.oxxa.com//command.php?apiuser=USER&apipassword=PASS&command=identity_del&
+https://api.oxxa.com/command.php?apiuser=USER&apipassword=PASS&command=identity_del&
 identity=ABCD123456
 
 Uitvoer:
@@ -1872,7 +1872,7 @@ Variabelen:
     -   IDENTITY                  (verplicht)   De handle van de op te vragen identity.
 
 Voorbeeld:
-https://api.oxxa.com//command.php?apiuser=USER&apipassword=PASS&command=identity_get&
+https://api.oxxa.com/command.php?apiuser=USER&apipassword=PASS&command=identity_get&
 identity=ABCD123456
 
 Uitvoer:
@@ -2048,7 +2048,7 @@ Variabelen:
     -   NS6_FQDN                  (optioneel)   FQDN van de 6e nameserver (Fully Qualified Domain Name).
 
 Voorbeeld:
-https://api.oxxa.com//command.php?apiuser=USER&apipassword=PASS&command=nsgroup_add&
+https://api.oxxa.com/command.php?apiuser=USER&apipassword=PASS&command=nsgroup_add&
 alias=NSGROUPNAME&ns1_fqdn=NS1.EXAMPLE.ORG&ns2_fqdn= NS2.EXAMPLE.ORG
 
 Uitvoer:
@@ -2080,7 +2080,7 @@ Variabelen:
     -   NSGROUP                   (verplicht)   Handle van de te verwijderen nameserver groep.
 
 Voorbeeld:
-https://api.oxxa.com//command.php?apiuser=USER&apipassword=PASS&command=nsgroup_del&
+https://api.oxxa.com/command.php?apiuser=USER&apipassword=PASS&command=nsgroup_del&
 nsgroup=DEFG456789
 
 Uitvoer:
@@ -2252,7 +2252,7 @@ Variabelen:
       -      TYPE                 (optioneel)   Transfer / register.
 
 Voorbeeld:
-https://api.oxxa.com//command.php?apiuser=USER&apipassword=PASS&command=order_list&status=P&
+https://api.oxxa.com/command.php?apiuser=USER&apipassword=PASS&command=order_list&status=P&
 type=TRANSFER&sortname=SLD&sortorder=ASC
 
 Uitvoer:
@@ -2628,7 +2628,7 @@ Variabelen:
     -   IDENTITY                  (verplicht)   Handle van de te verwijderen identity.
 
 Voorbeeld:
-https://api.oxxa.com//command.php?apiuser=USER&apipassword=PASS&command=resellerdel&
+https://api.oxxa.com/command.php?apiuser=USER&apipassword=PASS&command=resellerdel&
 identity=ABCD123456
 
 Uitvoer:
