@@ -1466,7 +1466,8 @@ Variabelen:
     -   IDENTITY-ADMIN            (optioneel)   Nieuwe waarde admin-identity (handle)
     -   IDENTITY-BILLING          (optioneel)   Nieuwe waarde billing-identity (handle)
     -   IDENTITY-TECH             (optioneel)   Nieuwe waarde tech-identity (handle)
-    -   IDENTITY-RESELLER         (optioneel)   Nieuwe waarde reseller-identity alleen voor .NL (handle)
+    -   IDENTITY-RESELLER         (optioneel)   Nieuwe waarde reseller-identity alleen voor .NL (handle).
+                                                Gebruik de waarde 'noprofile' om het profiel te ontkoppelen.
     -   EPP                       (optioneel)   Ter validatie van domeinnaamhouder wijzigingen (.BE)
 
 Voorbeeld:
@@ -1489,9 +1490,6 @@ Uitvoer:
            <done>TRUE</done>
        </order>
    </channel>
-
-Om een reseller profiel te verwijderen kan de waarde noprofile meegegeven worden bij het update van het
-domein.
 
 
 

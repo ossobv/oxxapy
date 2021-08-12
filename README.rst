@@ -164,7 +164,11 @@ Setting all NL domains that have no reseller to our only reseller:
     for domain in domains:
         assert domain.reseller == no_reseller, domain.reseller
         print(domain, 'setting reseller to', reseller)
-        # BEWARE: We can set a reseller, but trying to unset it (setting
-        # it to the NONE reseller), will fail. It appears OXXA has no API
-        # for this.
         domain.set_reseller(reseller)
+
+Unsetting a reseller profile from an NL-domain:
+
+.. code-block:: python
+
+    domain = api.domains.get('example.nl')
+    domain.set_reseller(api.resellers.none())

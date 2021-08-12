@@ -70,11 +70,9 @@ class OxxapyResellerNone(OxxapyReseller):
     whereas we want to have No-Reseller as an option.
     """
     def __init__(self):
-        # NOTE: We set handle to the empty string, because that is what we use
-        # when calling domain_upd when unsetting the identity-reseller.
-        # NOTE: However, it appears that it is impossible to unset a Reseller
-        # at this time.
-        super().__init__(core=None, handle='')
+        # > Om een reseller profiel te verwijderen kan de waarde
+        # > noprofile meegegeven worden bij het [updaten] van het domein.
+        super().__init__(core=None, handle='noprofile')
 
     def __repr__(self):
         return f'<OxxapyReseller[NONE]>'
@@ -90,6 +88,8 @@ class OxxapyResellers(Manager):
 
     def get(self, handle):
         "Get a single bound reseller"
+        if handle is None:
+            return OxxapyReseller.NONE
         return self._core._cache_get(
             OxxapyReseller, handle, (lambda: (
                 OxxapyReseller(self._core, handle))))
