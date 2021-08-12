@@ -1,3 +1,5 @@
+(this is NOT the OXXA API documentation v1.99; because wdoekes modified it)
+
 OXXA.COM API DOCUMENTATIE (V 1.99)
 
 
@@ -1254,6 +1256,7 @@ Uitvoer:
                <identity-admin> ABCD147258</identity-admin>
                <identity-billing> ABCD147258</identity-billing>
                <identity-tech> ABCD147258</identity-tech>
+               <identity-reseller/>
                <nsgroup>EFGH1234</nsgroup>
                <expire_date>04-10-2009 (dd-mm-yyyy)</expire_date>
                <autorenew>Y</autorenew>
@@ -1943,11 +1946,13 @@ Uitvoer:
                <identities_found>2</identities_found>
                - <identity>
                     <handle>ABCD123456</handle>
+                    <alias>naamalias</alias>
                     <company_name>bedrijfsnaam1</company_name>
                     <name>Achternaam, voornaam</name>
                </ identity >
                - < identity >
                     <handle>ABCD654321</handle>
+                    <alias>naamalias</alias>
                     <company_name>bedrijfsnaam1.</company_name>
                     <name>Achternaam, voornaam</name>
                </ identity >
@@ -2120,8 +2125,10 @@ Uitvoer:
            <status_description>De uitgebreide gegevens vind u in DETAILS</status_description>
            <price>0.00</price>
            - <details>
+               <alias>Managed DNS service</alias>
                <ns1_fqdn>ns1.example.org</ns1_fqdn>
                <ns2_fqdn>ns2.example.org</ns2_fqdn>
+               <last_updated>17-12-2009 16:01</last_updated>
            </details>
            <order_complete>TRUE</order_complete>
            <done>TRUE</done>
@@ -2162,23 +2169,28 @@ Uitvoer:
                <nsgroups_found>51</nsgroups_found>
                - <nsgroup>
                    <handle>EFGH1234</handle>
-                   <name>NS1</name>
+                   <alias>Managed DNS service</alias>
+                   - <nameservers>
+                       <ns1_fqdn>ns1.thednscompany.com</ns1_fqdn>
+                       <ns2_fqdn>ns2.thednscompany.com</ns2_fqdn>
+                       <ns3_fqdn>ns3.thednscompany.com</ns3_fqdn>
+                   </nameservers>
                </nsgroup>
                - <nsgroup>
                    <handle>EFGH1234</handle>
-                   <name> NS2</name>
+                   <alias>NS2</alias>
                </nsgroup>
                - <nsgroup>
                    <handle>EFGH1234</handle>
-                   <name> NS3</name>
+                   <alias>NS3</alias>
                </nsgroup>
                - <nsgroup>
                    <handle>EFGH1234</handle>
-                   <name> NS4</name>
+                   <alias>NS4</alias>
                </nsgroup>
                - <nsgroup>
                    <handle>EFGH1234</handle>
-                   <name> NS5</name>
+                   <alias>NS5</alias>
                </nsgroup>
            </details>
            <order_complete>TRUE</order_complete>
@@ -2668,19 +2680,17 @@ Uitvoer:
            <status_description>De uitgebreide gegevens vind u in DETAILS</status_description>
            <price>0.00</price>
            - <details>
+               <alias>bedrijfsalias</alias>
                <company>Bedrijfsnaam</company>
                <url>www.website.nl</url>
-               <firstname>A</firstname>
-               <lastname>Janssen</lastname>
                <street>Adres</street>
                <number>4</number>
                <suffix />
-               <postal>1234AB</postal>
+               <postalcode>1234AB</postalcode>
                <city>STAD</city>
                <tel>0123456789</tel>
                <email>adres@example.org</email>
                <country>NL</country>
-               <last_updated>07-08-2008 11:06 (d-m-y h:m)</last_updated>
            </details>
            <order_complete>TRUE</order_complete>
            <done>TRUE</done>
@@ -2724,13 +2734,13 @@ Uitvoer:
                <identities_found>2</identities_found>
                - <identity>
                     <handle>ABCD123456</handle>
-                    <company_name>bedrijfsnaam1</company_name>
-                    <name>Achternaam, voornaam</name>
+                    <alias>bedrijfsalias</alias>
+                    <company>bedrijfsnaam1</company>
                </ identity >
                - < identity >
                     <handle>ABCD654321</handle>
-                    <company_name>bedrijfsnaam1.</company_name>
-                    <name>Achternaam, voornaam</name>
+                    <alias>bedrijfsalias</alias>
+                    <company>bedrijfsnaam1</company>
                </ identity >
            </details>
            <order_complete>TRUE</order_complete>
