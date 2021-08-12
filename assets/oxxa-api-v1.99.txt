@@ -1,0 +1,3841 @@
+OXXA.COM API DOCUMENTATIE (V 1.99)
+
+
+
+Inhoud
+OXXA.com API DOCUMENTATIE (V 1.99)
+INTRODUCTIE
+DEFINITIES
+   DOMAIN
+   IDENTITIES
+   NSGROUPS
+   MANAGED DNS
+   RESELLER PROFIELEN
+   FOA EMAIL
+VERBINDING MAKEN
+TEST TRANSACTIES
+COMMANDO’S
+       AUTORENEW
+       CART_ADD
+       CART_DEL
+       CART_GET
+       CART_LIST
+       CART_PURCHASE
+       CART_UPD
+       DNSRECORD_ADD
+       DNSRECORD_DEL
+       DNSRECORD_LIST
+       DNSSEC_ADD
+       DNSSEC_DEL
+       DNSSEC_INFO
+       DNSTEMPLATE_ADD
+       DNSTEMPLATE_DEL
+       DNSTEMPLATE_GET
+       DNSTEMPLATE_LIST
+       DNSTEMPLATE_RECORD_ADD
+       DNSTEMPLATE_RECORD_DEL
+       DOMAIN_CHECK
+       DOMAIN_DEL
+       DOMAIN_EPP
+       DOMAIN_INF
+       DOMAIN_LIST
+       DOMAIN_NS_UPD
+       DOMAIN_PUSH
+       DOMAIN_RESTORE
+       FUNDS_GET
+       FUNDS_LIST
+       GLUE_ADD
+       GLUE_DEL
+       GLUE_GET
+       GLUE_LIST
+       GLUE_UPD
+       IDENTITY_ADD
+       IDENTITY_DEL
+       IDENTITY_GET
+       IDENTITY_LIST
+       IDENTITY_UPD
+       LOCK
+       NSGROUP_ADD
+       NSGROUP_DEL
+       NSGROUP_GET
+       NSGROUP_LIST
+       NSGROUP_UPD
+       ORDER_LIST
+       PRICECHECK
+       QUEUE_GET
+       QUEUE_LIST
+       QUEUE_UPD
+       QUEUE_DEL
+       REGISTER
+       REGISTER_STATUS
+       RENEW
+       RESELLERADD
+       RESELLERDEL
+       RESELLERGET
+       RESELLERLIST
+       RESELLERUPD
+       SERVER_CREATE
+       SERVER_LIST
+       SERVER_GET
+       SERVER_DELETE
+       SERVER_UPDATE
+       SSL_LIST
+       SSL_AUTORENEW
+       SSL_APPROVERLIST
+       SSL_STATUS
+       SSL_EXTENDED_STATUS
+       SSL_CANCEL
+       SSL_NEW
+       SSL_REISSUE
+       SSL_CHANGE_APPROVER
+       SSL_DOWNLOAD
+       SSL_RESEND_APPROVER
+       SSL_REVOKE
+       TASK_GET
+       TASK_LIST
+       TRANSFER
+       TRANSFER_STATUS
+       USER_FUNDS
+       USER_RESET
+       USER_TLD_LIST
+       OWNERCPENDING
+       OWNERCRESEND
+
+
+
+## INTRODUCTIE ##
+Dit document bevat een omschrijving van beschikbare commando’s voor de API. Ieder commando wordt
+omschreven, de in en uitvoer wordt gedefinieerd en er worden voorbeelden van toepassing gegeven.
+
+De API is gebaseerd op http requests waarin met de GET variabele waarden kunnen worden meegegeven.
+Vrijwel alle API aanroepen moeten worden voorzien van login gegevens.
+
+De respons is geformatteerd in XML. Het is belangrijk dat u ieder commando test en uw code baseert op de
+daadwerkelijke reactie van de API.
+
+Alle invoer variabelen (behalve wachtwoorden) zijn niet hoofdlettergevoelig, maar houdt rekening met het feit
+dat de door u gehanteerde programmeertaal dit wel kan zijn. Parameters zelf dienen in kleine letters ingevoerd
+te worden. De voorbeelden in dit document zijn opgemaakt om prettig leesbaar te zijn en zijn niet maatgevend
+voor de daadwerkelijke reactie van de API.
+
+De invoer dient URL encoded te worden aangeleverd voor een goede verwerking van de gegevens. Eventuele
+vreemde tekens dienen in PUNY gecodeerd te zijn.
+
+
+
+## CHANGELOG ##
+Overzicht van alle wijzigen van de API.
+
+Versie 1.99
+    • Introductie van de auto-install en auto-validate van SSL-certificaten. Hiervoor is het SSL_NEW
+        commando voorzien van nieuwe parameters (privatekey en client_server_id) en er zijn een aantal
+        nieuwe commando’s om servers te beheren voor het automatisch installeren van SSL-certificaten.
+
+Versie 1.98
+    • Nieuwe commando’s OWNERCPENDING en OWNERCRESEND toegevoegd waarmee inzicht in de
+        openstaande ownerc-verificaties kan worden verkregen en dit bericht ook opnieuw verstuurd kan
+        worden.
+
+Versie 1.97
+    • Uitbreiding response en parameters van commando’s SSL_PRODUCT_LIST, SSL_LIST, SSL_REISSUE,
+    • Nieuw commando SSL_EXTENDED_STATUS voor uitgebreide status van validatie, ook voor multi-
+        domein Extended Validatie.
+    • Nieuw commando SSL_CANCEL voor het binnen 30 dagen annuleren van aanvragen en nieuwe SSL-
+        certificaten.
+    • Documentatie wijziging TRANSFER commando. Autorenew parameter toegevoegd met default waarde
+        = Y.
+
+Versie 1.96
+    • Uitbreiding response van commando’s CART_GET en CART_LIST met expire_date_registry.
+    • Uitbreiding response van commando SSL_LIST met product en period, waarbij product het ID bevat
+        het van bewuste SSL en period het aantal jaren betreft.
+    • Nieuwe parameter “global_search” voor commando IDENTITY_LIST en NSGROUP_LIST waardoor in
+        alle velden gezocht kan worden van zowel nameservers als contactgegevens.
+
+Versie 1.95
+    • Deprecated: commando DOMAIN_LIST parameters TRANSFERD en DELETED.
+    • Deprecated: commando DOMAIN_LIST parameter STATUS, zoekwaarden A, Q, D, A.
+    • Nieuwe zoekwaarden voor parameter STATUS voor commando DOMAIN_LIST.
+    • Nieuwe parameter “excecution_at” voor REGISTER, TRANSFER, CART_UPD, CART_ADD commando’s.
+    • Nieuwe output parameter “execution_at” bij CART_LIST en CART_GET commando’s.
+    • Nieuwe commando’s QUEUE_GET, QUEUE_LIST, QUEUE_UPD en QUEUE_DEL. Deze nieuwe
+        commando’s maken toekomstige registraties en verhuizingen inzichtelijk.
+
+Versie 1.94
+    • Documentatie commando’s IDENTITY_ADD / IDENTITY_UPD uitgebreid met betrekking tot verplichte
+        velden voor bepaalde landen.
+    • Parameter “epp” toegevoegd aan DOMAIN_UPD commando voor het direct valideren van .be
+        domeinnaamhouder wijzigingen.
+
+Versie 1.93
+    • Uitbreiding parameters FUNDS_LIST commando.
+    • Uitbreiding parameters IDENTITY_ADD commando.
+    • Toevoeging parameter OVERRIDE_MANAGED_DNS_CHECK bij commando DNSSEC_DEL.
+    • Correctie documentie API response glue_list, glue_add.
+
+Versie 1.92
+    • DNS records verwijderen nieuwe variabelen (DNSRECORD_DEL).
+    • Inzage in de EPP-code (DOMAIN_EPP).
+    • Variabele toegevoegd voor het aanvragen van premium domeinen (REGISTER)
+    • TLD informatie uitbreiding, nu ook met DNSSEC (USER_TLD_LIST)
+    • Output voorbeeld SSL_DOWNLOAD commando gecorrigeerd in documentatie.
+
+      •      Toevoeging parameter start bij API commando TASK_LIST. Bedoeld voor introductie limiet a 500 regels
+             voor commando.
+      •      DOMAIN_NS_DATE parameter gemaakt “DNSSEC_DELETE”. Dit betreft een optionele parameter en
+             verwijderd DNSSEC materiaal bij wisselen nameservers.
+
+Versie 1.91
+
+      •      SSL reissue toegevoegd
+      •      SSL approver adressen ophalen met domain
+
+Versie 1.9
+
+      •      Aanvragen van SSL certificaten via de API
+
+Versie 1.82
+
+      •      Alias niet meer verplicht bij aanmaken identity, bij geen waarde zal de interne handle als alias gebruikt
+             worden
+      •      Start en records variabel bij het cart_list commando
+
+
+Versie 1.81
+
+      •      Verbinding maken via https
+
+Versie 1.8
+
+      •      FOA e-mail her sturen
+      •      Status FOA opvragen via order_list commando
+
+Versie 1.7
+
+      •      Nieuwe functionaliteit SIDN registraties, het meegeven van een reseller profiel. Let op de reseller
+             profielen zijn niet dezelfde profielen als die van het commando identity_add, voor het aanmaken van
+             een reseller profiel gebruik je het commando reselleradd.
+
+Versie 1.6:
+
+      •      Extra veld toegevoegd aan het commando domain_list om alle verhuisde domeinen van de afgelopen
+             24 uur weer te geven.
+      •      Extra veld toegevoegd aan het commando domain_list om alle verwijderde domeinen van de
+             afgelopen 24 uur weer te geven.
+
+Versie 1.5:
+
+      •      Commando dnssec_add toegevoegd.
+      •      Commando dnssec_del toegevoegd.
+      •      Commando dnssec_info toegevoegd.
+
+
+
+## DEFINITIES ##
+In de documentatie worden diverse termen gehanteerd. Voor een beter begrip van de uitleg wordt in dit
+hoofdstuk worden enkele van deze veel voorkomende termen gedefinieerd .
+
+DOMAIN
+Het begrip Domeinnaam of Domeinnamen bestaan in de context van dit document altijd uit een aantal
+attributen.
+
+Allereerst is de domeinnaam opgesplitst in twee gedeelten:
+     -   SLD (Second Level Domain)
+     -   TLD (Top Level Domain)
+
+In het voorbeeld example.org is ‘example’ de SLD en ‘org’ de TLD.
+
+Verder bevat een domeinnaam diverse gegevens die worden gebruikt voor WHOIS weergave of andere
+doeleinden, hierbij onderscheiden we 4 categorieën:
+    -   Registrant_identity: Een houder (registrant in het Engels) is een instantie/persoon op wiens naam een
+        domeinnaam na registratie is gesteld. De houder draagt de verantwoordelijkheid voor deze
+        domeinnaam en het gebruik ervan, alsmede voor de juistheid van de voor deze domeinnaam
+        vastgelegde gegevens.
+    -   Admin_identity: De admin-c is het aanspreekpunt voor de registry en anderen indien er zich niet-
+        technische problemen met de betreffende domeinnaam voordoen. U kunt hierbij denken aan
+        meldingen inzake een aangemelde arbitrageprocedure of een melding van de registry dat uw
+        domeinnaam om een bepaalde reden wordt opgeheven. Mededelingen die per e-mail gedaan worden
+        aan het opgegeven admin-c e-mailadres worden geacht de domeinnaamhouder bereikt te hebben.
+
+             Daarnaast vertegenwoordigt het opgegeven admin-c contact de domeinnaamhouder. De admin-c is
+             gerechtigd om wijzigingen ten aanzien van uw domeinnaam door te voeren. Gezien het bovenstaande
+             is het verstandig om een admin-c e-mailadres door te geven dat daadwerkelijk door of namens u als
+             domeinnaamhouder wordt gelezen.
+      -      Billing_identity: De billing is het aanspreekpunt voor de registry van een TLD (extensie) indien er zich
+             financiële problemen met de betreffende domeinnaam voordoen.
+      -      Tech_identity: De tech-c is het aanspreekpunt voor de registry van een TLD (extensie) indien er zich
+             technische problemen met de betreffende domeinnaam voordoen..
+
+Bij elke domeinaanvraag of verhuizing moeten deze 4 groepen opgegeven worden door het aanwijzen van
+bestaande contact profielen (identities).
+
+Tevens bevat een domeinnaam een nsgroup attribuut. Dit is een referentie naar de nameservergroep die voor
+het domeinnaam is gespecificeerd. In een nsgroup kunnen maximaal 6 nameservers zijn opgenomen.
+
+Ten slotte bevat een domeinnaam ook nog een aantal andere administratieve attributen:
+    -    Autorenew:    Bepaald of het betreffende domein automatisch verlengd moet worden of niet.
+    -    Lock:         Bepaald de verhuisstatus van het domein.
+    -    Expire_date: Vertegenwoordigd de eind- of vervaldatum van een domeinnaam.
+
+
+
+## IDENTITIES ##
+Een identity (profiel) is een set gegevens welke gezamenlijk een contactpersoon vertegenwoordigen. Profielen
+kunnen in diverse rollen worden toegepast: registrant_identity, admin_identity, billing_identity en
+tech_identity.
+
+De WHOIS gegevens van een domeinnaam zijn gebaseerd op de aan het domein gekoppelde identities.
+Wanneer een identity wordt bijgewerkt, worden de wijzigingen direct verwerkt in alle aan het profiel
+gekoppelde domeinnamen.
+
+NSGROUPS
+Een nsgroup is een set van nameservers welke gezamenlijk de dns resolving van een domeinnaam verzorgen.
+
+Deze groep bestaat minimaal uit 2 en maximaal uit 6 individuele nameservers. Als een nsgroup wordt
+bijgewerkt, worden alle domeinnamen die aan deze nsgroup zijn gekoppeld bijgewerkt.
+
+MANAGED DNS
+Bij registratie van domeinnamen kan er gebruik worden gemaakt van de whitelable systeem nameservers voor
+domeinnaamregistraties in plaats van gebruik te maken van uw eigen nameservers. De nameservers zijn
+whitelable door gebruik van de anonieme namen ns1.yourdomainnameregistrar.com,
+ns2.yourdomainnameregistrar.com en ns3.yourdomainnameregistrar.com
+
+Per domein kunnen in de portal en middels de API dns records als MX, A records en CNAMES worden beheerd
+per domeinnaam. Tevens kunnen er vooraf geconfigureerde instellingen worden opgeslagen in dns templates
+zodat niet bij iedere registratie dezelfde instellingen opnieuw te hoeven worden gemaakt.
+
+RESELLER PROFIELEN
+Sinds kort is het mogelijk om in de WHOIS van de SIDN jouw gegevens als reseller te vermelden. Voordeel
+hiervan is dat voortaan jouw gegevens als reseller ook vermeld staan in de WHOIS naast de gegevens van de
+registrar.
+
+FOA EMAIL
+Voor een aantal gTLDS wordt een FOA e-mail verzonden wanneer je een domein probeert te verhuizen naar
+ons. Deze moet bevestigd worden door de huidige registrant van het domein.
+
+
+
+## VERBINDING MAKEN ##
+Om verbinding te maken met de API dient er een http request gemaakt te worden over een beveiligde
+verbinding naar https://api.oxxa.com/command.php waarbij de waarden in de GET variabelen wordt
+geplaatst.
+
+Iedere API call begint met de authenticatie van de gebruiker. Door middel van het verstrekken van
+gebruikersnaam en wachtwoord wordt de authenticatie volbracht:
+
+Voorbeeld:
+https://api.oxxa.com/command.php?apiuser=GEBRUIKERSNAAM&apipassword=WACHTWOORD
+
+Er kan gebruik gemaakt worden van een MD5 gecodeerd wachtwoord. Converteer het wachtwoord naar MD5
+en plaats voor het wachtwoord de string ‘MD5’.
+
+Voorbeeld:
+MD57c3ac9af1e799e123864bc23e1851a2f
+
+Na authenticatie wordt het gewenste commando aangegeven door deze toe te voegen aan de API call
+
+Voorbeeld:
+Met de hierna volgende url wordt het commando ‘domain_list’ uitgevoerd.
+https://api.oxxa.com/command.php?apiuser=GEBRUIKERSNAAM&apipassword=WACHTWOORD&command=d
+omain_list
+
+De API uitvoer is geformatteerd in XML, bijvoorbeeld:
+ <?xml version="1.0" encoding="ISO-8859-1" ?>
+   - <channel>
+       - <order>
+           <order_id>1234567</order_id>
+           <command>domain_list</command>
+           <status_code>XMLOK18</status_code>
+           <status_description>In DETAILS vind u de uitgebreide informatie</status_description>
+           <price>0.00</price>
+           <details>
+              <domains_total>1</domains_total>
+              <domains_found>1</domains_found>
+              - <domain>
+                  <domainname>example.org</domainname>
+                  <nsgroup>ABCD123456</nsgroup>
+                  <start_date>2009-04-08</start_date>
+                  <expire_date>2010-04-08</expire_date>
+                  <autorenew>Y</autorenew>
+                  <lock>Y</lock>
+              </domain>
+           </details>
+           <order_complete>TRUE</order_complete>
+           <done>TRUE</done>
+     </order>
+ </channel>
+
+<order_id>                        het ordernummer van de actie.
+<command>                         het ingegeven commando.
+<status_code>                     resultaat van de http call.
+<status_description>              omschrijving van de resultaat gegevens behorende bij status_code.
+<price>                           gerekende tarief voor de uitvoer van deze call.
+<details>                         eventuele uitgebreide informatie (niet altijd van toepassing).
+<order_complete>                  status van de order, kan TRUE, PENDING of FALSE zijn.
+<done>                            geeft aan of het einde van de output is bereikt.
+
+
+
+## TEST TRANSACTIES ##
+Test transacties kunnen worden uitgevoerd door de _GET variabele test=Y toe te voegen aan de http request
+string.
+
+Door toevoeging van deze variabele worden de commando’s REGISTER en TRANSFER in testmodus uitgevoerd
+en worden er geen daadwerkelijke orders tot registratie of verhuizing verwerkt.
+
+
+
+## COMMANDO’S ##
+
+AUTORENEW
+
+Beschrijving:
+Met dit commando kan worden bepaald of een domeinnaam automatisch 30 dagen voor de afloopdatum
+automatisch door het systeem wordt verlengd.
+
+Variabelen:
+    -   SLD                       (verplicht)   Sld van de aan te passen domeinnaam.
+    -   TLD                       (verplicht)   Tld van de aan te passen domeinnaam.
+    -   AUTORENEW                 (verplicht)   Waarde van de automatisch verlengen (Y of N).
+
+Voorbeeld:
+https://api.oxxa.com/command.php?apiuser=USER&apipassword=PASS&command=autorenew&autorenew
+=Y&sld=EXAMPLE&tld=ORG
+
+Uitvoer:
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+   - <channel>
+       - <order>
+           <order_id>123456</order_id>
+           <command>autorenew</command>
+           <sld>example</sld>
+           <tld>org</tld>
+           <status_code>XMLOK 2</status_code>
+           <status_description>Autorenew voor dit domein is aangepast</status_description>
+           <price>1.993</price>
+           <details>Autorenew aangepast naar: Y</details>
+           <order_complete>TRUE</order_complete>
+           <done>TRUE</done>
+       </order>
+   </channel>
+
+
+
+## CART_ADD ##
+
+Beschrijving:
+Met dit commando kunnen items in de cart van de user worden geplaatst.
+
+Variabelen:
+    -   SLD                       (verplicht)   Sld van het domein.
+    -   TLD                       (verplicht)   Tld van het domein.
+    -   PRODUCTTYPE               (verplicht)   Type van een item (renew/register/transfer/uit quarantaine).
+    -   IDENTITY-ADMIN            (optioneel)   Handle van de admin identity.
+    -   IDENTITY-TECH             (optioneel)   Handle van de tech identity.
+    -   IDENTITY-BILLING          (optioneel)   Handle van de billing identity.
+    -   IDENTITY-REGISTRANT       (optioneel)   Handle van de registrant identity.
+    -   IDENTITY-RESELLER         (optioneel)   Handle van een reseller (alleen voor .NL)
+    -   NSGROUP                   (optioneel)   Handle van de nameserver groep.
+    -   TRANS_EPP                 (optioneel)   Eventuele authorisatiecode van het domein.
+    -   ENDUSERIP                 (verplicht)   IP adres van de eindgebruiker.
+    -   QUANTITY                  (optioneel)   Aantal van de cart-regel (default: 1)
+    -   AUTORENEW                 (optioneel)   Domein op autorenew (Y of N) (default: Y).
+    -   USETRUSTEE                (optioneel)   Domein op trustee (Y of N) (default: N).
+    -   LOCK                      (optioneel)   Moet het domein op LOCK staan (Y of N)(default: Y).
+    -   EXECUTION_AT              (optioneel)   Datum waarop de order uitgevoerd wordt (DD-MM-YYYY)
+
+Voorbeeld:
+https://api.oxxa.com/command.php?apiuser=USER&apipassword=PASS&command=cart_add&tld=ORG&
+sld=EXAMPLE&producttype=RENEW&enduserip=1.99.3.4
+
+Uitvoer:
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+   - <channel>
+       - <order>
+           <order_id>123456</order_id>
+           <command>cart_add</command>
+           <sld>example</sld>
+           <tld>org</tld>
+           <status_code>XMLOK 32</status_code>
+           <status_description>Het item is aan de cart toegevoegd</status_description>
+           <price />
+           <order_complete>TRUE</order_complete>
+           <done>TRUE</done>
+       </order>
+   </channel>
+
+
+
+## CART_DEL ##
+
+Beschrijving:
+Met dit commando kan een item uit de cart worden verwijdert of de hele cart worden leeg gemaakt.
+
+Variabelen:
+    -   ENDUSERIP                 (verplicht)   IP adres van eindgebruiker waar dit item onder staat.
+    -   ITEMID                    (verplicht)   ID van het item (uit te lezen met card_get).
+    -   EMPTYCART                 (verplicht)   Haal de hele cart leeg (Y) of alleen het betreffende item (N).
+
+Voorbeeld:
+https://api.oxxa.com/command.php?apiuser=USER&apipassword=PASS&command=cart_del&
+enduserip=1.99.3.4&emptycart=Y
+
+Uitvoer:
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+   - <channel>
+       - <order>
+           <order_id>123456</order_id>
+           <command>cart_del</command>
+           <status_code>XMLOK 36</status_code>
+           <status_description>De cart is leeg gemaakt</status_description>
+           <price />
+           <order_complete>TRUE</order_complete>
+           <done>TRUE</done>
+       </order>
+   </channel>
+
+
+
+## CART_GET ##
+
+Beschrijving:
+Met dit commando kan de configuratie van een item in de cart van de user worden opgevraagd. Het benodigde
+cart_id kan wordt verstrekt bij het in de cart plaatsen (cart_add) en kan worden teruggelezen in het cart
+overzicht (cart_list).
+
+Variabelen:
+    -   CART_ID                   (verplicht)   ID nummer van het cart item.
+
+Voorbeeld:
+https://api.oxxa.com//command.php?apiuser=USER&apipassword=PASS&command=cart_get&cart_id=999
+
+Uitvoer:
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+   - <channel>
+       - <order>
+           <order_id>123456</order_id>
+           <command>cart_get</command>
+           <status_code>XMLOK 49</status_code>
+           <status_description>De informatie vind u in DETAILS</status_description>
+           <price>0</price>
+           - <details>
+               <sld>example</sld>
+               <tld>org</tld>
+               <command>register</command>
+               <amount>1</amount>
+               <identity-admin>ABCD1234</identity-admin>
+               <identity-tech> ABCD1234</identity-tech>
+               <identity-billing> ABCD1234</identity-billing>
+               <identity-registrant> ABCD1234</identity-registrant>
+               <identity-reseller>ABCD1234</identity-reseller>
+               <nsgroup>ABCD1234</nsgroup>
+               <template>ABCD1234</ template >
+               <trustee>N</trustee>
+               <epp></epp>
+               <autorenew>Y</autorenew>
+               <lock>Y</lock>
+               <execution_at> 20-11-2018</ execution_at>
+               <expire_date_registry> 20-11-2018</ expire_date_registry >
+           </details>
+           <order_complete>TRUE</order_complete>
+           <done>TRUE</done>
+       </order>
+   </channel>
+
+
+
+## CART_LIST ##
+
+Beschrijving:
+Dit commando geeft een lijst van alle items die momenteel in de cart van de user aanwezig zijn.
+
+Variabelen:
+    -   START                     (optioneel)    Om te bepalen om op te halen vanaf ID x.
+    -   RECORDS                   (optioneel)    Het aantal records dat opgehaald moet worden.
+
+Voorbeeld:
+https://api.oxxa.com/command.php?apiuser=USER&apipassword=PASS&command=cart_list&start=0&recor
+ds=20
+
+Uitvoer:
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+   - <channel>
+       - <order>
+           <order_id>123456</order_id>
+           <command>cart_list</command>
+           <status_code>XMLOK 33</status_code>
+           <status_description>
+               Cart succesvol opgevraagd, uitgebreide informatie vind u in details
+           </status_description>
+           <price>0</price>
+           - <details>
+               <cartcount>3</cartcount>
+               <totalcartcount>3</totalcartcount>
+               - <item>
+                    <itemid>96</itemid>
+                    <producttype>register</producttype>
+                    <productdesc>example1.org</productdesc>
+                    <itemprice>6.36</itemprice>
+                    <quantity>1</quantity>
+                    <autorenew>Y</autorenew>
+                    <trustee>N</trustee>
+                    <lock>Y</lock>
+                    <configok>Y</configok>
+                    <execution_at>20-11-2018</ execution_at>
+                    <expire_date_registry> 20-11-2018</ expire_date_registry >
+               </item>
+           </details>
+           <order_complete>TRUE</order_complete>
+           <done>TRUE</done>
+       </order>
+   </channel>
+
+
+
+## CART_PURCHASE ##
+
+Beschrijving:
+Dit commando biedt de gedeeltelijke óf de volledige inhoud van de cart ter bestelling aan. Let op: items in de
+cart dienen eerst correct geconfigureerd te zijn alvorens de cart_purchase kan worden uitgevoerd.
+
+Variabelen:
+    -   CART_ID                   (verplicht)   Cart_id van het item of ALL om de volledige cart aan te schaffen.
+
+Voorbeeld:
+https://api.oxxa.com//command.php?apiuser=USER&apipassword=PASS&command=cart_purchase&
+cart_id=ALL
+
+Uitvoer:
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+   - <channel>
+       - <order>
+           <order_id>123456</order_id>
+           <command> cart_purchase </command>
+           <status_code>XMLOK 47</status_code>
+           <status_description>De cart is succesvol ge-purchased, in de details vind u informatie over de
+       individuele items</status_description>
+           <price>0</price>
+           - <details>
+               - <cartitem>
+                   <cartitemid>96</cartitemid>
+                   <command>register</command>
+                   <sld>example1</sld>
+                   <tld>org</tld>
+                   <status_code>XMLERR 19</status_code>
+                   <status_description>
+                       Dit domein kan niet geregistreerd worden omdat het bezet is.
+                   </status_description>
+               </cartitem>
+               - <cartitem>
+                   <cartitemid>97</cartitemid>
+                   <command>register</command>
+                   <sld>example2</sld>
+                   <tld>org</tld>
+                   <status_code>XMLERR 19</status_code>
+                   <status_description>
+                       Dit domein kan niet geregistreerd worden omdat het bezet is.
+                   </status_description>
+               </cartitem>
+           </details>
+           <order_complete>TRUE</order_complete>
+           <done>TRUE</done>
+       </order>
+   </channel>
+
+
+
+## CART_UPD ##
+
+Beschrijving:
+Dit commando configureert een item in de cart zodat deze middels een cart_purchase besteld kan worden.
+
+Variabelen:
+    -   ENDUSERIP                 (verplicht)   IP adres van eindgebruiker waar dit item onder staat.
+    -   ITEMID                    (verplicht)   ID van het item (uit te lezen met card_get).
+    -   IDENTITY-ADMIN            (optioneel)   Handle van de admin identity.
+    -   IDENTITY-TECH             (optioneel)   Handle van de tech identity.
+    -   IDENTITY-BILLING          (optioneel)   Handle van de billing identity.
+    -   IDENTITY-REGISTRANT       (optioneel)   Handle van de registrant identity.
+    -   IDENTITY-RESELLER         (optioneel)   Handle van een reseller (alleen voor .NL)
+    -   NSGROUP                   (optioneel)   Handle van de nameserver groep.
+    -   TEMPLATE                  (optioneel)   Handle van een DNS template bij managed dns service
+    -   TRANS_EPP                 (optioneel)   Eventuele authorisatiecode van het domein.
+    -   QUANTITY                  (optioneel)   Nieuwe waarde voor AANTAL.
+    -   AUTORENEW                 (optioneel)   Nieuwe waarde voor AUTORENEW (Y of N).
+    -   LOCK                      (optioneel)   Nieuwe waarde voor LOCK (Y of N).
+    -   USETRUSTEE                (optioneel)   Nieuwe waarde voor USETRUSTEE (Y of N).
+    -   EXECUTION_AT              (optioneel)   Datum waarop de order uitgevoerd wordt (DD-MM-YYYY)
+
+Voorbeeld:
+https://api.oxxa.com/command.php?apiuser=USER&apipassword=PASS&command=cart_upd&
+enduserip=1.99.3.4&itemid=12345&quantity=5&autorenew=Y&lock=Y
+
+Uitvoer:
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+   - <channel>
+       - <order>
+           <order_id>123456</order_id>
+           <command>cart_upd</command>
+           <status_code>XMLOK 34</status_code>
+           <status_description>Het cartitem is succesvol geupdate</status_description>
+           <price />
+           <order_complete>TRUE</order_complete>
+           <done>TRUE</done>
+       </order>
+   </channel>
+
+
+
+## DNSRECORD_ADD ##
+
+Beschrijving:
+Met dit commando kan er een DNS record toegevoegd worden aan een domein.
+
+Variabelen:
+    -   SLD                       (verplicht)   Sld van het domein waaraan DNS records toegevoegd worden.
+    -   TLD                       (verplicht)   Tld van het domein waaraan DNS records toegevoegd worden.
+    -   VALUE                     (verplicht)   Waarde (bijv. www.example.com).
+    -   TYPE                      (verplicht)   Type van het record (MX, A, AAAA,CNAME, TXT).
+    -   DATA                      (verplicht)   Bijvoorbeeld IP adres bij A-record.
+    -   PRIORITY                  (optioneel)   Prioriteit van MX record.
+
+Voorbeeld:
+https://api.oxxa.com/command.php?apiuser=USER&apipassword=PASS&command=dnsrecord_add&sld=EX
+AMPLE&tld=COM&value=WWW.EXAMPLE.COM&type=MX&data=192.168.0.1&priority=1
+
+Uitvoer:
+<?xml version="1.0" encoding="ISO-8859-1"?>
+   - <channel>
+       - <order>
+           <order_id>123456</order_id>
+           <command>dnsrecord_add</command>
+           <sld>example</sld>
+           <tld>com</tld>
+           <status_code>XMLOK 60</status_code>
+           <status_description>Het DNS record is succesvol toegevoegd</status_description>
+           <price>0</price>
+           <order_complete>TRUE</order_complete>
+           <done>TRUE</done>
+       </order>
+   </channel>
+
+
+
+## DNSRECORD_DEL ##
+
+Beschrijving:
+Met dit commando kan er een DNS record verwijderd worden welke aan een domein toegewezen is.
+
+Variabelen:
+    -   SLD                       (verplicht)   Sld van het domein waaraan DNS records toegevoegd worden.
+    -   TLD                       (verplicht)   Tld van het domein waaraan DNS records toegevoegd worden.
+    -   VALUE                     (verplicht)   Waarde (bijv. www.example.com).
+    -   TYPE                      (verplicht)   Type van het record (MX, A, AAAA,CNAME, TXT).
+    -   DATA                      (verplicht)   Bijvoorbeeld IP adres bij A-record.
+    -   PRIORITY                  (optioneel)       Prioriteit van MX record.
+    -   TTL                       (verplicht)   DE TTL van de record.
+
+Voorbeeld:
+https://api.oxxa.com/command.php?apiuser=USER&apipassword=PASS&command=dnsrecord_del&sld=EXA
+MPLE&tld=COM&value=WWW.EXAMPLE.COM&type=MX&data=192.168.0.1&priority=1&ttl=3600
+
+Uitvoer:
+<?xml version="1.0" encoding="ISO-8859-1"?>
+   - <channel>
+       - <order>
+           <order_id>123456</order_id>
+           <command> dnsrecord_del</command>
+           <status_code>XMLOK 59</status_code>
+           <status_description>Het DNS template record is verwijderd</status_description>
+           <price>0</price>
+           <order_complete>TRUE</order_complete>
+           <done>TRUE</done>
+       </order>
+   </channel>
+
+
+
+## DNSRECORD_LIST ##
+
+Beschrijving:
+Met dit commando is een lijst op te halen van alle DNS records welke er toegevoegd zijn aan een domein.
+
+Variabelen:
+    -   START                     (optioneel)   Om te bepalen om op te halen vanaf ID x.
+    -   RECORDS                   (optioneel)   Het aantal records dat opgehaald moet worden.
+    -   SORTNAME                  (optioneel)   Sorteren op value, data of type.
+    -   SORTORDER                 (optioneel)   Sorteren van de lijst op ASC of DESC.
+    -   VALUE                     (optioneel)   Zoeken op bepaalde value.
+    -   DATA                      (optioneel)   Zoeken op bepaalde data.
+    -   TYPE                      (optioneel)   Zoeken op bepaalde type.
+    -   TLD                       (verplicht)   Tld van het domein waarvan de gegevens opgehaald worden.
+    -   SLD                       (verplicht)   Sld van het domein waarvan de gegevens opgehaald worden.
+
+Voorbeeld:
+https://api.oxxa.com/command.php?apiuser=USER&apipassword=PASS&command=dnsrecord_list&start=0
+&records=5&sortname=VALUE&sortorder=ASC&value=&data=&type=&tld=COM&sld=EXAMPLE
+
+Uitvoer:
+<?xml version="1.0" encoding="ISO-8859-1"?>
+   - <channel>
+       - <order>
+           <order_id>123456</order_id>
+           <command>dnsrecord_list</command>
+           <status_code>XMLOK 61</status_code>
+           <status_description>In DETAILS vind u de uitgebreide informatie</status_description>
+           <price>0</price>
+           - <details>
+              <records_total>2</ records _total>
+              < records _found>2</ records _found>
+              - <record>
+                  <record_id>1</template_id>
+                  <value>www.example.com</ value>
+                  <type>MX</ type>
+                  <data>192.168.0.1</ data>
+                  <priority>1</ priority>
+              </ record >
+           </details>
+           <order_complete>TRUE</order_complete>
+           <done>TRUE</done>
+       </order>
+   </channel>
+
+
+
+## DNSSEC_ADD ##
+
+Beschrijving:
+Met dit commando kan er een DNSSEC record toegevoegd worden aan een domein.
+
+Variabelen:
+    -    SLD                           (verplicht)      Domein waar het aan toegevoegd moet worden
+    -    TLD                           (verplicht)      Extensie van het domein
+    -    FLAG                          (verplicht)      Het type publieke sleutel
+    -    PROTOCOL                      (verplicht)      Domein waar het aan toegevoegd moet worden
+    -    ALG                           (verplicht)      Algoritme waarmee de sleutel is aangemaakt
+    -    PUBKEY                        (verplicht)      De publieke sleutel
+
+Voorbeeld:
+https://api.oxxa.com/command.php?apiuser=USER&apipassword=PASS&command=dnssec_add&sld=SLD&tl
+d=TLD&flag=FLAG&protocol=PROTOCOL&alg=ALG&pubkey=PUBKEY
+
+Uitvoer:
+<?xml version="1.0" encoding="ISO-88591"?>
+   - <channel>
+       - <order>
+           <order_id>123456</order_id>
+           <command>dnssec_add</command>
+           <status_code>XMLOK 82</status_code>
+           <status_description>DNSSEC record is toegevoegd aan het domein</status_description>
+           <price>0</price>
+           <order_complete>TRUE</order_complete>
+           <done>TRUE</done>
+       </order>
+   </channel>
+
+
+
+## DNSSEC_DEL ##
+
+Beschrijving:
+Met dit commando kan er een DNSSEC verwijderd worden, hiervoor zijn dezelfde gegevens noodzakelijk als bij
+het aanmaken van een DNSSEC record. DNSSEC records kunnen niet aangepast worden en moeten altijd eerst
+verwijderd worden en daarna opnieuw toegevoegd worden.
+
+Variabelen:
+    -    SLD        (verplicht)  Domein waar het aan toegevoegd moet worden
+    -    TLD        (verplicht)  Extensie van het domein
+    -    FLAG       (verplicht)  Het type publieke sleutel
+    -    PROTOCOL   (verplicht)  Domein waar het aan toegevoegd moet worden
+    -    ALG        (verplicht)  Algoritme waarmee de sleutel is aangemaakt
+    -    PUBKEY     (verplicht)  De publieke sleutel
+    -    OVERRIDE_MANAGED_DNS_CHECK (optioneel) DNSSEC verwijderen bij gebruik Managed DNS
+
+Voorbeeld:
+https://api.oxxa.com/command.php?apiuser=USER&apipassword=PASS&command=dnssec_del&sld=SLD&tl
+d=TLD&flag=FLAG&protocol=PROTOCOL&alg=ALG&pubkey=PUBKEY
+
+Uitvoer:
+<?xml version="1.0" encoding="ISO-88591"?>
+   - <channel>
+       - <order>
+           <order_id>123456</order_id>
+           <command>dnssec_del</command>
+           <status_code>XMLOK 81</status_code>
+           <status_description>DNSSEC record is verwijderd van het domein</status_description>
+           <price>0</price>
+           <order_complete>TRUE</order_complete>
+           <done>TRUE</done>
+       </order>
+   </channel>
+
+
+
+## DNSSEC_INFO ##
+
+Beschrijving:
+Met dit commando kunnen alle DNSSEC records opgehaald worden van het domein. Deze informatie kan je
+gebruiken om records te verwijderen
+
+Variabelen:
+    -    SLD                      (verplicht)   Domein waar het aan toegevoegd moet worden
+    -    TLD                      (verplicht)   Extensie van het domein
+
+Voorbeeld:
+https://api.oxxa.com/command.php?apiuser=USER&apipassword=PASS&command=dnssec_info&sld=SLD&t
+ld=TLD
+
+Uitvoer:
+<?xml version="1.0" encoding="ISO-88591"?>
+   - <channel>
+       - <order>
+           <order_id>123456</order_id>
+           <command>dnssec_info</command>
+           <status_code>XMLOK 80</status_code>
+           <status_description>DNSSEC informatie opgehaald, zie details element</status_description>
+           <price>0</price>
+           <details>
+              <ns>
+                  <nameserver>ns1.xxx.nl</nameserver>
+                  <nameserver>ns2.xxx.nl</nameserver>
+                  <nameserver>ns3.xxx.nl</nameserver>
+              </ns>
+              <dnssec>
+                  <key>
+                      < flags>…</flags>
+                      < protocol>…</protocol>
+                      < alg>…</alg>
+                      < pubKey>…</pubKey>
+                  </key>
+                  <key>
+                      < flags>…</flags>
+                      < protocol>…</protocol>
+                      < alg>…</alg>
+                      < pubKey>…</pubKey>
+                  </key>
+              </dnssec>
+           </details>
+           <order_complete>TRUE</order_complete>
+           <done>TRUE</done>
+       </order>
+   </channel>
+
+
+
+## DNSTEMPLATE_ADD ##
+
+Beschrijving:
+Met dit commando kan er een nieuwe dns template toegevoegd worden aan de server. Server zal als return de
+handle teruggeven van de desbetreffende template. Deze is noodzakelijk om een dns record toe te kunnen
+voegen aan een template.
+
+Variabelen:
+    -    ALIAS                    (verplicht)   Alias van de dns template
+
+Voorbeeld:
+https://api.oxxa.com/command.php?apiuser=USER&apipassword=PASS&command=dnstemplate_add&alias
+=ALIAS
+
+Uitvoer:
+<?xml version="1.0" encoding="ISO-88591"?>
+   - <channel>
+       - <order>
+           <order_id>123456</order_id>
+           <command>dnstemplate_add</command>
+           <status_code>XMLOK 57</status_code>
+           <status_description>DNS template succesvol aangemaakt</status_description>
+           <price>0</price>
+           - <details>
+              <handle>RXZP69272</handle>
+           </details>
+           <order_complete>TRUE</order_complete>
+           <done>TRUE</done>
+       </order>
+   </channel>
+
+
+
+## DNSTEMPLATE_DEL ##
+
+Beschrijving:
+Met dit commando kan een aangemaakte template verwijderd worden.
+
+Variabelen:
+    -   HANDLE                    (verplicht)   Handle van de template
+
+Voorbeeld:
+https://api.oxxa.com/command.php?apiuser=USER&apipassword=PASS&command=dnstemplate_del&hand
+le=HANDLE
+
+Uitvoer:
+<?xml version="1.0" encoding="ISO-8859-1"?>
+   - <channel>
+       - <order>
+           <order_id>123456</order_id>
+           <command>dnstemplate_del</command>
+           <status_code>XMLOK 59</status_code>
+           <status_description>Het DNS template record is verwijderd</status_description>
+           <price>0</price>
+           <order_complete>TRUE</order_complete>
+           <done>TRUE</done>
+       </order>
+   </channel>
+
+
+
+## DNSTEMPLATE_GET ##
+
+Beschrijving:
+Met dit commando is de template DNS data op te halen welke aan een bepaalde template toegevoegd zijn.
+
+Variabelen:
+    -   HANDLE
+
+Voorbeeld:
+https://api.oxxa.com/command.php?apiuser=USER&apipassword=PASS&command=dnstemplate_get&hand
+le=HANDLE
+
+Uitvoer:
+<?xml version="1.0" encoding="ISO-8859-1"?>
+   - <channel>
+       - <order>
+           <order_id>123456</order_id>
+           <command>dnstemplate_get</command>
+           <status_code>XMLOK 61</status_code>
+           <status_description>In DETAILS vind u de uitgebreide informatie</status_description>
+           <price>0</price>
+           <details>
+              <record>
+                  <record_id>14</record_id>
+                  <value>WWW.EXAMPLE.COM</value>
+                  <type>MX</type>
+                  <data>192.168.0.1</data>
+                  <priority>1</priority>
+              </record>
+           </details>
+           <order_complete>TRUE</order_complete>
+           <done>TRUE</done>
+       </order>
+   </channel>
+
+
+
+## DNSTEMPLATE_LIST ##
+
+Beschrijving:
+Met dit commando is een lijst van DNS records op te halen welke aan een DNS template gekoppeld zijn.
+
+Variabelen:
+    -   START                     (optioneel)      Om te bepalen om op te halen vanaf ID x.
+    -   RECORDS                   (optioneel)      Het aantal records dat opgehaald moet worden.
+    -   SORTNAME                  (optioneel)      Sorteren op alias.
+    -   SORTORDER                 (optioneel)      Sorteren van de lijst op ASC of DESC.
+    -   ALIAS                     (optioneel)      Bepaalde template ophalen.
+
+Voorbeeld:
+https://api.oxxa.com/command.php?apiuser=USER&apipassword=PASS&command=dnstemplate_list&start
+=25&records=25&sortname=ALIAS&sortorder=DESC&alias=TEMPLATE
+
+Uitvoer:
+<?xml version="1.0" encoding="ISO-8859-1"?>
+   - <channel>
+       - <order>
+           <order_id>123456</order_id>
+           <command>dnstemplate_list</command>
+           <status_code>XMLOK 62</status_code>
+           <status_description>In de DETAILS vind u de uitgebreide informatie</status_description>
+           <price>0</price>
+           - <details>
+              <templates_total>2</templates_total>
+              <templates_found>2</templates_found>
+              - <template>
+                  <handle> RXZP69272</ handle >
+                  <name>Voorbeeld 1</name>
+              </template>
+              - <template>
+                  < handle > RXZP69272</ handle >
+                  <name>Voorbeeld 2</name>
+              </template>
+           </details>
+           <order_complete>TRUE</order_complete>
+           <done>TRUE</done>
+       </order>
+   </channel>
+
+
+
+## DNSTEMPLATE_RECORD_ADD ##
+
+Beschrijving:
+Met dit commando kan er een nieuw record toegevoegd worden aan een template.
+
+Variabelen:
+    -   HANDLE                    (verplicht)   Deze waarde is gelijk aan de handle van de template
+    -   VALUE                     (verplicht)   Waarde van het record (bijv. www.example.com)
+    -   TYPE                      (verplicht)   Type van het record (MX, A, AAAA,CNAME, TXT)
+    -   DATA                      (verplicht)   Bijvoorbeeld IP adres bij A-record
+    -   PRIORITY                  (optioneel)   Prioriteit van MX record
+    -   TTL                       (verplicht)   Tijd welke minimaal 120 moet zijn
+
+Voorbeeld:
+https://api.oxxa.com/command.php?apiuser=USER&apipassword=PASS&command=dnstemplate_record_ad
+d&handle=VOORBEELD&value=WWW.EXAMPLE.NL&type=MX&data=192.168.0.1&priority=1&ttl=120
+
+Uitvoer:
+<?xml version="1.0" encoding="ISO-8859-1"?>
+   - <channel>
+       - <order>
+           <order_id>123456</order_id>
+           <command>dnstemplate_record_add</command>
+           <status_code>XMLOK 58</status_code>
+           <status_description>Het DNS template record is succesvol toegevoegd</status_description>
+           <price>0</price>
+           <order_complete>TRUE</order_complete>
+           <details>RECORD_ID</details>
+           <done>TRUE</done>
+       </order>
+   </channel>
+
+
+
+## DNSTEMPLATE_RECORD_DEL ##
+
+Beschrijving:
+Met dit commando kan er een dns template record verwijderd worden.
+
+Variabelen:
+    -   RECORDID                  (verplicht)   Het ID van de te verwijderen DNS template record.
+
+Voorbeeld:
+https://api.oxxa.com/command.php?apiuser=USER&apipassword=PASS&command=dnstemplate_record_de
+l&recordid=ID
+
+Uitvoer:
+<?xml version="1.0" encoding="ISO-8859-1"?>
+   - <channel>
+       - <order>
+           <order_id>123456</order_id>
+           <command>dnstemplate_record_del</command>
+           <status_code>XMLOK 59</status_code>
+           <status_description>Het DNS template record is verwijderd</status_description>
+           <price>0</price>
+           <order_complete>TRUE</order_complete>
+           <done>TRUE</done>
+       </order>
+   </channel>
+
+
+
+## DOMAIN_CHECK ##
+
+Beschrijving:
+Met dit commando kan de beschikbaarheid van een domein worden gecontroleerd (vrij of bezet). Er is een
+daglimiet van 9.999 op het aantal bevragingen ingesteld.
+
+Variabelen:
+    -   SLD                       (verplicht)   Sld van de te controleren domeinnaam
+    -   TLD                       (verplicht)   Tld van de te controleren domeinnaam
+
+Voorbeeld:
+https://api.oxxa.com/command.php?apiuser=USER&apipassword=PASS&command=domain_check&tld=OR
+G&sld=EXAMPLE
+
+Uitvoer:
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+   - <channel>
+       - <order>
+           <order_id>123456</order_id>
+           <command>domain_check</command>
+           <sld>example</sld>
+           <tld>org</tld>
+           <status_code>XMLOK 10</status_code>
+           <status_description>Domein is bezet</status_description>
+           <price>0</price>
+           <order_complete>TRUE</order_complete>
+           <done>TRUE</done>
+       </order>
+   </channel>
+
+
+
+## DOMAIN_DEL: ##
+
+Beschrijving:
+Dit commando plaatst een domein onmiddellijk in quarantaine. Let op: de quarantaine status is alleen terug te
+draaien door het domein uit quarantaine te halen, hier zijn altijd kosten aan verbonden.
+
+Variabelen:
+    -   SLD                       (verplicht)   Sld van de domeinnaam die in quarantaine moet worden geplaatst.
+    -   TLD                       (verplicht)   Tld van de domeinnaam die in quarantaine moet worden geplaatst.
+
+Voorbeeld:
+https://api.oxxa.com/command.php?apiuser=USER&apipassword=PASS&command=domain_del&
+sld=EXAMPLE&tld=ORG
+
+Uitvoer:
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+   - <channel>
+       - <order>
+           <order_id>123456</order_id>
+           <command>domain_del</command>
+           <sld>example</sld>
+           <tld>org</tld>
+           <status_code>XMLPEN 11</status_code>
+           <status_description>De domeinnaam wordt opgeheven</status_description>
+           <price>0</price>
+           <order_complete>FALSE</order_complete>
+           <done>TRUE</done>
+       </order>
+   </channel>
+
+
+
+## DOMAIN_EPP ##
+
+Beschrijving:
+Dit commando zend de EPP code van een domein per email aan de registrant. In het veld details kunt u bij een
+aantal TLD gelijk de verhuiscode inzien. Dit is helaas niet mogelijk bij alle TLD’s en daarom worden deze per e-
+mail verzonden.
+
+Variabelen:
+    -   SLD                       (verplicht)   Sld van het domein.
+    -   TLD                       (verplicht)   Tld van het domein.
+
+Voorbeeld:
+https://api.oxxa.com/command.php?apiuser=USER&apipassword=PASS&command=domain_epp&
+sld=EXAMPLE&tld=ORG
+
+Uitvoer:
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+   - <channel>
+       - <order>
+           <order_id>123456</order_id>
+           <command>domain_epp</command>
+           <sld>example</sld>
+           <tld>org</tld>
+           <status_code>XMLOK 39</status_code>
+           <status_description>De EPP code is verstuurd naar de registrant</status_description>
+           <price />
+           <details>EPPCODE</details>
+           <order_complete>TRUE</order_complete>
+           <done>TRUE</done>
+       </order>
+    </channel>
+
+
+
+## DOMAIN_INF ##
+
+Beschrijving:
+Dit commando geeft de actuele configuratie van een domeinnaam registratie. Relevant zijn: NSGROUP,
+IDENTITIES, EXPIRE_DATE,AUTORENEW,LOCK
+
+Variabelen:
+    -   SLD                       (verplicht)   Sld van de domeinnaam.
+    -   TLD                       (verplicht)   Tld van de domeinnaam.
+
+Voorbeeld:
+https://api.oxxa.com//command.php?apiuser=USER&apipassword=PASS&command=domain_inf&tld=ORG&
+sld=EXAMPLE
+
+Uitvoer:
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+   - <channel>
+       - <order>
+           <order_id />
+           <command>domain_inf</command>
+           <sld>example</sld>
+           <tld>org</tld>
+           <status_code>XMLOK 16</status_code>
+           <status_description>In DETAILS vind u de uitgebreide informatie</status_description>
+           <price>0.00</price>
+           - <details>
+               <identity-registrant>ABCD147258</identity-registrant>
+               <identity-admin> ABCD147258</identity-admin>
+               <identity-billing> ABCD147258</identity-billing>
+               <identity-tech> ABCD147258</identity-tech>
+               <nsgroup>EFGH1234</nsgroup>
+               <expire_date>04-10-2009 (dd-mm-yyyy)</expire_date>
+               <autorenew>Y</autorenew>
+               <lock>N</lock>
+               <dnssec>N</dnssec>
+           </details>
+           <order_complete>TRUE</order_complete>
+           <done>TRUE</done>
+       </order>
+   </channel>
+
+* Let op, hoewel een TLD DNSSEC ondersteunt is het mogelijk dat niet alle domeinnamen met deze extensie
+ook de mogelijkheid hebben om DNSSEC doordat niet alle domeinnamen bij dezelfde registry zijn
+geregistreerd. Neem contact op met Customer Support indien u DNSSEC wilt toepassen op dergelijke
+domeinnamen.
+
+
+
+## DOMAIN_LIST ##
+
+Beschrijving:
+Dit commando geeft een lijst van domeinnamen die onder beheer van de gebruiker. Diverse zoek opties
+behoren tot de mogelijkheden. Voor het veld transferd en deleted moet een Y meegegeven worden.
+
+Variabelen:
+    -   START                     (optioneel)
+                                            Startveld van de lijstweergave (standaard = 0)
+    -   RECORDS                   (optioneel)
+                                            Maximaal te tonen records in lijstweergave (standaard = 25, bij een
+                                            waarde van -1 wordt de volledige lijst getoond)
+      -      SORTNAME        (optioneel) Veld waarop de lijstweergave gesorteerd wordt
+      -      SORTORDER       (optioneel) Sorteervolgorde aflopend of oplopend (ASC / DESC)
+      -      SLD             (optioneel) Zoekvoorwaarde voor de SLD
+      -      TLD             (optioneel) Zoekvoorwaarde voor de TLD
+      -      NSGROUP         (optioneel) Zoekvoorwaarde voor de nsgroup
+      -      IDENTITY        (optioneel) Zoekvoorwaarde voor een van de identities
+      -      AUTORENEW       (optioneel) Zoekvoorwaarde voor de autorenew
+      -      LOCK            (optioneel) Zoekvoorwaarde voor de lock
+      -      EXPIRE_DATE     (optioneel) Zoekvoorwaarde voor de expire_date
+      -      STATUS          (optioneel) Zoekvoorwaarde voor status:
+                 o Active       Alle actieve domeinnamen
+                 o Quarantaine Alle domeinnamen in quarantaine
+                 o Delete       Alle verwijderde domeinnamen
+                 o Inactive     Alle in-actieve domeinnamen
+                 o Transferd    Alle wegverhuisde domeinnamen (te combineren met DAYS)
+                 o Expired      Alle verlopen domeinnamen (te combineren met DAYS)
+                 o Renewed      Alle verlengde domeinnamen (te combineren met DAYS)
+                 o Renew        Alle aankomende verlengingen (te combineren met DAYS)
+      -      DAYS            (optioneel) Zoekwaarde die te combineren is met status parameters.
+
+Voorbeeld:
+https://api.oxxa.com/command.php?apiuser=USER&apipassword=PASS&command=domain_list&tld=ORG
+&sortname=SLD&sortorder=ASC&start=0&records=2&transferd=Y&deleted=Y
+
+Uitvoer:
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+   - <channel>
+       - <order>
+           <order_id>123456</order_id>
+           <command>domain_list</command>
+           <tld>org</tld>
+           <status_code>XMLOK18</status_code>
+           <status_description>In DETAILS vind u de uitgebreide informatie</status_description>
+           <price>0.00</price>
+           - <details>
+               <domains_total>100</domains_total>
+               <domains_found>25</domains_found>
+               - <domain>
+                   <domainname>example1.org</domainname>
+                   <nsgroup>EFGH123456</nsgroup>
+                   <identity-registrant> ABCD123456</identity-registrant>
+                   <identity-admin> ABCD 123456</identity-admin>
+                   <identity-tech> ABCD 123456</identity-tech>
+                   <identity-billing> ABCD 123456</identity-billing>
+                   <expire_date>2009-10-06</expire_date>
+                   <autorenew>Y</autorenew>
+                   <lock>Y</lock>
+               </domain>
+               - <domain>
+                   <domainname>example2.org</domainname>
+                   <nsgroup>EFGH123456</nsgroup>
+                   <identity-registrant> ABCD123456</identity-registrant>
+                   <identity-admin> ABCD123456</identity-admin>
+                   <identity-tech> ABCD123456</identity-tech>
+                   <identity-billing> ABCD123456</identity-billing>
+                   <expire_date>2008-10-09</expire_date>
+                   <autorenew>Y</autorenew>
+                   <lock>Y</lock>
+                </domain>
+               - <domain>
+            </details>
+           <order_complete>TRUE</order_complete>
+           <done>TRUE</done>
+        </order>
+     </channel>
+
+
+
+## DOMAIN_NS_UPD ##
+
+Beschrijving:
+Dit commando werkt de configuratie van een domeinnaam bij met nieuwe nameserver profiel instellingen.
+
+Variabelen:
+    -   SLD                       (verplicht)   Sld van de domeinnaam die wordt aangepast.
+    -   TLD                       (verplicht)   Tld van de domeinnaam die wordt aangepast.
+    -   NSGROUP                   (optioneel)   Nieuwe waarde NSGROUP (handle)
+    -   handle                    (optioneel)   Het meegeven van een dns handle aan het domein
+    -   DNSSEC_DELETE             (optioneel)   Verwijderd DNSSEC materiaal bij wisselen nameservers (Y/N)
+
+Voorbeeld:
+https://api.oxxa.com/command.php?apiuser=USER&apipassword=PASS&command=domain_ns_upd&
+sld=EXAMPLE&tld=ORG&nsgroup=EFGH123456
+
+Uitvoer:
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+   - <channel>
+       - <order>
+           <order_id>123456</order_id>
+           <command>domain_ns_upd</command>
+           <sld>example</sld>
+           <tld>org</tld>
+           <status_code>XMLOK 12</status_code>
+           <status_description>Domein succesvol aangepast</status_description>
+           <price>0</price>
+           <order_complete>FALSE</order_complete>
+           <done>TRUE</done>
+       </order>
+   </channel>
+
+
+
+## DOMAIN_PUSH ##
+
+Beschrijving:
+Dit commando plaatst een domein onder beheer van een andere gebruiker.
+
+Variabelen:
+    -   SLD                       (verplicht)   Sld van het domein.
+    -   TLD                       (verplicht)   Tld van het domein.
+    -   USERNAME                  (verplicht)   Gebruikersnaam van de nieuwe eigenaar.
+
+Voorbeeld:
+https://api.oxxa.com/command.php?apiuser=USER&apipassword=PASS&command=domain_push&
+sld=EXAMPLE&tld=ORG&username=NEW_USER
+
+Uitvoer:
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+   - <channel>
+       - <order>
+           <order_id>123456</order_id>
+           <command>domain_push</command>
+           <sld>example</sld>
+           <tld>org</tld>
+           <status_code>XMLOK 38</status_code>
+           <status_description>Domeinpush succesvol uitgevoerd</status_description>
+           <price />
+           <order_complete>TRUE</order_complete>
+           <done>TRUE</done>
+       </order>
+   </channel>
+
+
+
+## DOMAIN_RESTORE ##
+
+Beschrijving:
+Dit commando hersteld een domeinnaam uit quarantaine.
+
+Variabelen:
+    -   SLD                       (verplicht)   Sld van het domein.
+    -   TLD                       (verplicht)   Tld van het domein.
+
+Voorbeeld:
+https://api.oxxa.com/command.php?apiuser=USER&apipassword=PASS&command=domain_restore&
+sld=EXAMPLE&tld=ORG&nsgroup=EFGH1234
+
+Uitvoer:
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+   - <channel>
+       - <order>
+           <order_id>123456</order_id>
+           <command>domain_restore</command>
+           <sld>example</sld>
+           <tld>org</tld>
+           <status_code>XMLPEN 12</status_code>
+           <status_description>Het domein wordt uit quarantaine heeft gehaald</status_description>
+           <price />
+           <order_complete>PENDING</order_complete>
+           <done>TRUE</done>
+       </order>
+   </channel>
+
+
+
+## DOMAIN_UPD: ##
+
+Beschrijving:
+Dit commando werkt de configuratie van een domeinnaam bij met nieuwe contact profiel instellingen. Alle
+velden zijn optioneel, maar er moet tenminste 1 wijziging worden doorgegeven.
+
+Let op: een wijziging van de IDENTITY-REGISTRANT wordt opgevat als een domeinnaam overdracht naar een
+nieuwe houder. Afhankelijk van de domeinnaam extensie kan de registry hiervoor kosten in rekening brengen
+welke worden doorberekend.
+
+Variabelen:
+    -   SLD                       (verplicht)   Sld van de domeinnaam die wordt aangepast.
+    -   TLD                       (verplicht)   Tld van de domeinnaam die wordt aangepast.
+    -   IDENTITY-REGISTRANT       (optioneel)   Nieuwe waarde registry-identity (handle)
+    -   IDENTITY-ADMIN            (optioneel)   Nieuwe waarde admin-identity (handle)
+    -   IDENTITY-BILLING          (optioneel)   Nieuwe waarde billing-identity (handle)
+    -   IDENTITY-TECH             (optioneel)   Nieuwe waarde tech-identity (handle)
+    -   IDENTITY-RESELLER         (optioneel)   Nieuwe waarde reseller-identity alleen voor .NL (handle)
+    -   EPP                       (optioneel)   Ter validatie van domeinnaamhouder wijzigingen (.BE)
+
+Voorbeeld:
+https://api.oxxa.com/command.php?apiuser=USER&apipassword=PASS&command=domain_upd&
+sld=EXAMPLE&tld=ORG&identity-registrant=ABCD123456&identity-admin=ABCD123456&identity-
+billing=ABCD123456&identity-tech=ABCD123456&identity-reseller=ABCD123456&epp=XXX
+
+Uitvoer:
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+   - <channel>
+       - <order>
+           <order_id>123456</order_id>
+           <command>domain_upd</command>
+           <sld>example</sld>
+           <tld>org</tld>
+           <status_code>XMLOK 12</status_code>
+           <status_description>Domein succesvol aangepast</status_description>
+           <price>0</price>
+           <order_complete>FALSE</order_complete>
+           <done>TRUE</done>
+       </order>
+   </channel>
+
+Om een reseller profiel te verwijderen kan de waarde noprofile meegegeven worden bij het update van het
+domein.
+
+
+
+## FUNDS_GET ##
+
+Beschrijving:
+Dit commando geeft het actuele krediet saldo in euros van een gebruiker.
+
+Variabelen:
+    -   APIUSER                   (verplicht)   Account gebruikersnaam
+    -   APIPASSWORD               (verplicht)   Account wachtwoord
+
+Voorbeeld:
+https://api.oxxa.com/command.php?apiuser=USER&apipassword=PASS&command=funds_get
+
+
+Uitvoer:
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+   - <channel>
+       - <order>
+           <order_id>123456</order_id>
+           <command>funds_get</command>
+           <status_code>XMLOK 40</status_code>
+           <status_description>De credits zijn opgevraagd, u vind dit in de DETAILS</status_description>
+           <price />
+           - <details>
+               <funds_total>9999.99</funds_total>
+               <funds_reserved>150.00</funds_reserved>
+               <funds_available>9849.99</funds_available>
+           </details>
+           <order_complete>TRUE</order_complete>
+           <done>TRUE</done>
+       </order>
+   </channel>
+
+
+
+## FUNDS_LIST ##
+
+Beschrijving:
+Dit commando geeft de financiële transacties op over een bepaalde periode voor de gegeven gebruiker.
+
+Variabelen:
+    -   BEGIN                     (optioneel)   Begindatum voor overzicht (DD-MM-YYYY).
+    -   END                       (optioneel)   Einddatum voor overzicht (DD-MM-YYYY).
+    -   SORTORDER                 (optioneel)   Aflopend/ Oplopend (parameter DESC/ASC).
+    -   START                     (optioneel)   Records weergeven vanaf regelnummer.
+    -   RECORDS                   (optioneel)   Aantal records (-1 geeft alles weer).
+    -   SORTNAME                  (optioneel)   Type sortering (date/description).
+    -   DESCRIPTION               (optioneel)   Filter van het description veld.
+
+Voorbeeld:
+https://api.oxxa.com/command.php?apiuser=USER&apipassword=PASS&command=funds_list&
+end=01-12-2018
+
+Uitvoer:
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+   - <channel>
+       - <order>
+           <order_id>123456</order_id>
+           <command>funds_list</command>
+           <status_code>XMLOK 41</status_code>
+           <status_description>Financiele mutaties opgevraagd, u vindt ze in DETAILS</status_description>
+           <price />
+           - <details>
+               - <order>
+                   <orders_id>123456</orders_id>
+                   <price>0.00</price>
+                   <date>02-12-2008</date>
+                   <note>bijgeboekt vanwege storting</note>
+               </order>
+               - <order>
+                   <orders_id>123456</orders_id>
+                   <price>0.00</price>
+                   <date>02-12-2008</date>
+                   <note>bijgeboekt vanwege storting</note>
+               </order>
+           </details>
+           <order_complete>TRUE</order_complete>
+           <done>TRUE</done>
+       </order>
+</channel>
+
+
+
+## FOARESEND ##
+
+Beschrijving:
+Dit commando geeft je de mogelijkheid om de FOA e-mail opnieuw te versturen.
+
+Variabelen:
+    -   SLD                       (verplicht)   Sld van de domeinnaam.
+    -   TLD                       (verplicht)   Tld van de domeinnaam.
+
+Voorbeeld:
+https://api.oxxa.com/command.php?apiuser=USER&apipassword=PASS&command=foaresend&
+sld=SLD&tld=TLD
+
+Uitvoer:
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+   - <channel>
+       - <order>
+           <order_id>123456</order_id>
+           <command>foa_resend</command>
+           <status_code> XMLOK 109</status_code>
+           <status_description> FOA opnieuw verzonden aan registrant</status_description>
+           <price />
+           <order_complete>TRUE</order_complete>
+           <done>TRUE</done>
+       </order>
+</channel>
+
+
+
+## GLUE_ADD ##
+
+Beschrijving:
+Met dit commando kan er aan een nameserver een IP adres gekoppeld worden. Dit is noodzakelijk wanneer
+het domein gelijk is aan de opgegeven nameservers.
+
+Variabelen:
+    -   NS_FQDN                   (verplicht)   De nameserver waaraan het IP adres toegevoegd moet worden.
+    -   NS_IP                     (verplicht)   Het IP adres wat toegevoegd moet worden aan de nameserver
+
+Voorbeeld:
+https://api.oxxa.com//command.php?apiuser=USER&apipassword=PASS&command=glue_add&ns_fqdn=ns
+1.website.nl&ns_ip=192.168.0.1
+
+Uitvoer:
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+   - <channel>
+       - <order
+           <order_id>123456</order_id>
+           <command>glue_add</command>
+           <status_code>XMLOK 69</status_code>
+           <status_description>Glue record succesvol aangemaakt</status_description>
+           <price>0</price>
+           <order_complete>TRUE</order_complete>
+           <done>TRUE</done>
+       </order>
+   </channel>
+
+
+
+## GLUE_DEL ##
+
+Beschrijving:
+Met dit commando kan er een IP adres ontkoppeld worden van een nameserver.
+
+Variabelen:
+    -   NS_FQDN                   (verplicht)   De nameserver waarvan het IP adres verwijderd moet worden.
+    -   NS_IP                     (verplicht)   Het IP adres wat verwijderd moet worden.
+
+Voorbeeld:
+https://api.oxxa.com/command.php?apiuser=USER&apipassword=PASS&command=glue_del&ns_fqdn=ns1.
+website.nl&ns_ip=192.168.0.1
+
+Uitvoer:
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+   - <channel>
+       - <order
+           <order_id>123456</order_id>
+           <command>glue_del</command>
+           <status_code>XMLOK 70</status_code>
+           <status_description> Glue record succesvol verwijderd</status_description>
+           <price>0</price>
+           <order_complete>TRUE</order_complete>
+           <done>TRUE</done>
+       </order>
+   </channel>
+
+
+
+## GLUE_GET ##
+
+Beschrijving:
+Met dit commando kan er van een nameserver de glue record opgehaald worden.
+
+Variabelen:
+    -   NS_FQDN                   (verplicht)   De nameservers waarvan de glue records opgehaald moeten worden.
+
+Voorbeeld:
+https://api.oxxa.com/command.php?apiuser=USER&apipassword=PASS&command=glue_get&ns_fqdn=ns1.
+website.nl
+
+Uitvoer:
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+   - <channel>
+       - <order
+           <order_id>123456</order_id>
+           <command>glue_get</command>
+           <status_code>XMLOK 227</status_code>
+           <status_description>Glue record succesvol opgehaald</status_description>
+           <price>0</price>
+           <details>
+              <ip_adres>192.168.0.1</ip_adres>
+           </details>
+           <order_complete>TRUE</order_complete>
+           <done>TRUE</done>
+       </order>
+   </channel>
+
+
+
+## GLUE_LIST ##
+
+Beschrijving:
+Met dit commando kan er een lijst opgehaald worden van alle gluerecords welke er aan nameservers
+gekoppeld zijn.
+
+Variabelen:
+    -   NS_FQDN                   (optioneel)   De nameservers waarvan de glue records opgehaald worden.
+    -   NS_IP                     (optioneel)   Het IP adres wat toegevoegd moet worden aan de nameserver.
+    -   START                     (optioneel)   Bij welk veld moet worden begonnen met weergave.
+    -   RECORDS                   (optioneel)   Hoeveel records moeten er opgehaald worden.
+    -   SORTNAME                  (optioneel)   Veld waarop de lijst gesorteerd moet worden.
+    -   SORTORDER                 (optioneel)   Sorteren op ASC of DESC.
+
+Voorbeeld:
+https://api.oxxa.com/command.php?apiuser=USER&apipassword=PASS&command=glue_list&ns_fqdn=ns1.
+website.nl&ns_ip=192.168.0.1&start=0&records=10&sortorder=asc
+
+Uitvoer:
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+   - <channel>
+       - <order
+           <order_id>123456</order_id>
+           <command>glue_get</command>
+           <status_code>XMLOK 67</status_code>
+           <status_description>Glue record succesvol opgehaald</status_description>
+           <price>0</price>
+           <details>
+              <ns1.doubleserver.net>192.168.0.1</ ns1.doubleserver.net >
+           </details>
+           <order_complete>TRUE</order_complete>
+           <done>TRUE</done>
+       </order>
+   </channel>
+
+
+
+## GLUE_UPD ##
+
+Beschrijving:
+Met dit commando kan er een IP aangepast worden welke gekoppeld is aan een nameserver.
+
+Variabelen:
+    -   NS_FQDN                   (verplicht)   De nameserver waaraan het IP adres toegevoegd moet worden.
+    -   NS_IP                     (verplicht)   Het IP adres wat toegevoegd moet worden aan de nameserver
+
+Voorbeeld:
+https://api.oxxa.com//command.php?apiuser=USER&apipassword=PASS&command=glue_upd&ns_fqdn=ns
+1.website.nl&ns_ip=192.168.0.1
+
+Uitvoer:
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+   - <channel>
+       - <order
+           <order_id>123456</order_id>
+           <command>glue_add</command>
+           <status_code>XMLOK 71</status_code>
+           <status_description>Glue records succesvol aangepast</status_description>
+           <price>0</price>
+           <order_complete>TRUE</order_complete>
+           <done>TRUE</done>
+       </order>
+   </channel>
+
+
+
+## IDENTITY_ADD ##
+
+Beschrijving:
+Dit commando voegt een contact profiel (identity) aan het systeem toe.
+
+Variabelen:
+    -   ALIAS                     (optioneel)   Alias van de identity (default is de interne handle)
+    -   COMPANY                   (optioneel)   Is opgegeven identity een bedrijf (Y of N).
+    -   COMPANY_NAME              (optioneel)   Bedrijfsnaam voor identity.
+    -   JOBTITLE                  (optioneel)   Aanhef van personen, verplicht veld bij bedrijven*
+    -   FIRSTNAME**               (verplicht)   Voornaam voor identity.
+    -   LASTNAME**                (verplicht)   Achternaam voor identity.
+    -   STREET**                  (verplicht)   Straatnaam voor identity.
+    -   NUMBER**                  (verplicht)   Huisnummer voor identity.
+    -   SUFFIX**                  (optioneel)   Toevoeging huisnummer voor identity.
+    -   POSTALCODE**              (verplicht)   Postcode voor identity.
+    -   CITY**                    (verplicht)   Woonplaats voor identity.
+    -   STATE**                   (verplicht)   State/provincie voor identity.
+    -   TEL**                     (verplicht)   Telefoonnummer voor identity.
+    -   FAX***                    (optioneel)   Faxnummer voor identity.
+    -   EMAIL                     (verplicht)   E-mailadres voor identity. (toegestane tekens A-Z0-9._%-)
+    -   COUNTRY                   (verplicht)   Landcode voor identity.
+    -   DATEBIRTH                 (optioneel)   Geboorte datum van de contactpersoon(DD-MM-YYYY).
+    -   PLACEBIRTH                (optioneel)   Geboorteplaats van de contactpersoon.
+    -   COUNTRYBIRTH              (optioneel)   Geboortelandcode (bijvoorbeeld NL of BE).
+    -   POSTALBIRTH               (optioneel)   Geboorteland postcode.
+    -   IDNUMBER                  (optioneel)   Alleen van toepassing op particulieren: het identificatie-nummer.
+    -   REGNUMBER                 (optioneel)   Alleen van toepassing op bedrijven: kamer van koophandel nummer.
+    -   VATNUMBER                 (optioneel)   Alleen van toepassing op bedrijven: BTW nummer.
+    -   TMNUMBER                  (optioneel)   Alleen van toepassing op trademarks: identificatie nummer.
+    -   TMCOUNTRY                 (optioneel)    Alleen van toepassing op trademarks: trademark land.
+    -   IDCARDDATE                (optioneel)   Id nummer van legitimatiebewijs van contactpersoon.
+    -   IDCARDISSUER              (optioneel)   Uitegevende instantie van het legitimatiebewijs.
+    -   XXXMEMBERID               (optioneel)   Member ID van de sponsored community.
+    -   XXXPASSWORD               (optioneel)   Wachtwoord van XXXMEMBERID.
+    -   ENS_ID                    (optioneel)   Luchtvaart ENS ID. Benodigd voor .AERO domeinnamen.
+    -   ENS_PASSWORD              (optioneel)   Wachtwoord van ENS_ID.
+    -   PROFESSION                (optioneel)   Benodigd voor .PRO domeinnamen.
+    -   TRAVEL_UIN_ID             (optioneel)   Benodigd voor .TRAVEL domeinnamen.
+
+* Let op, de aanhef is een veld waarbij bijvoorbeeld dhr., mevr., prof, dr, CEO, etc meegegeven kan worden.
+** Deze parameter is standaard verplicht, per land is een uitzondering mogelijk (voorbeeld Bonaire).
+*** Deze parameter is standaard optioneel, per land is een uitzondering mogelijk.
+
+Voorbeeld:
+https://api.oxxa.com/command.php?apiuser=USER&apipassword=PASS&command=identity_add&
+company=Y&company_name=BEDRIJFSNAAM&firstname=VOORNAAM&lastname=ACHTERNAAM&
+street=STRAAT&number=66&postalcode=POSTCODE&city=WOONPLAATS&country=NL&tel=0123456789&
+email=ADRES@EXAMPLE.ORG&state=NB&jobtitle=DHR
+
+Uitvoer:
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+   - <channel>
+
+        - <order>
+            <order_id>123456</order_id>
+            <command>identity_add</command>
+            <status_code>XMLOK 7</status_code>
+            <status_description>
+               De identity is succesvol aangemaakt, de handle vind u in de details
+            </status_description>
+            <price>0.00</price>
+            <details>ABCD123456</details>
+            <order_complete>TRUE</order_complete>
+            <done>TRUE</done>
+        </order>
+     </channel>
+
+
+
+## IDENTITY_DEL ##
+
+Beschrijving:
+Dit commando verwijdert een aangemaakte identity uit het systeem. De betreffende identity kan niet meer
+gebruikt worden voor nieuwe domeinen; domeinen die reeds gebruik maken van deze identity blijven
+ongewijzigd.
+
+Variabelen:
+    -   IDENTITY                  (verplicht)   Handle van de te verwijderen identity.
+
+Voorbeeld:
+https://api.oxxa.com//command.php?apiuser=USER&apipassword=PASS&command=identity_del&
+identity=ABCD123456
+
+Uitvoer:
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+   - <channel>
+       - <order>
+           <order_id>123456</order_id>
+           <command>identity_del</command>
+           <status_code>XMLOK 9</status_code>
+           <status_description>Identity is succesvol verwijdert</status_description>
+           <price>0.00</price>
+           <details>ABCD123456</details>
+           <order_complete>TRUE</order_complete>
+           <done>TRUE</done>
+       </order>
+   </channel>
+
+
+
+## IDENTITY_GET ##
+
+Omschrijving:
+Dit commando geeft alle attributen van een bestaande identity.
+
+Variabelen:
+    -   IDENTITY                  (verplicht)   De handle van de op te vragen identity.
+
+Voorbeeld:
+https://api.oxxa.com//command.php?apiuser=USER&apipassword=PASS&command=identity_get&
+identity=ABCD123456
+
+Uitvoer:
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+   - <channel>
+       - <order>
+           <order_id>123456</order_id>
+           <command>identity_get</command>
+           <status_code>XMLOK 23</status_code>
+           <status_description>De uitgebreide gegevens vind u in DETAILS</status_description>
+           <price>0.00</price>
+           - <details>
+               <company>Y</company>
+               <company_name>Bedrijfsnaam</company_name>
+               <jobtitle>CEO</jobtitle>
+               <firstname>A</firstname>
+               <lastname>Janssen</lastname>
+               <street>Adres</street>
+               <number>4</number>
+               <suffix />
+               <postalcode>1234AB</postalcode>
+               <city>STAD</city>
+               <state>NB</state>
+               <tel>0123456789</tel>
+               <fax />
+               <email>adres@example.org</email>
+               <country>NL</country>
+               <last_updated>07-08-2008 11:06 (d-m-y h:m)</last_updated>
+           </details>
+           <order_complete>TRUE</order_complete>
+           <done>TRUE</done>
+       </order>
+   </channel>
+
+
+
+## IDENTITY_LIST ##
+
+Beschrijving:
+Dit commando geeft een lijst met identities. Diverse zoekfunctionaliteiten zijn beschikbaar.
+
+Variabelen:
+    -   HANDLE                    (optioneel)   Zoekwaarde voor de identity handle.
+    -   NAME                      (optioneel)   Zoekwaarde voor de naam.
+    -   COMPANY_NAME              (optioneel)   Zoekwaarde voor bedrijfsnaam.
+    -   ALIAS                     (optioneel)   Zoekwaarde voor de alias.
+    -   SORTNAME                  (optioneel)   Veld waarop gesorteerd moet worden.
+    -   SORTORDER                 (optioneel)   Sorteervolgorde (ASC of DESC).
+    -   GLOBAL_SEARCH             (optioneel)   Zoekwaarde voor alle velden.
+    -   START                     (optioneel)   Bij welk veld moet worden begonnen met weergave
+                                                (standaard: 0).
+      -      RECORDS              (optioneel)   Hoeveel records moeten er worden weergegeven
+                                                (standaard: 25, -1 is alles).
+
+Voorbeeld:
+https://api.oxxa.com/command.php?apiuser=USER&apipassword=PASS&command=identity_list&
+sortname=NAME&sortorder=ASC&identity=A&name=A&company_name=A&records=2&start=0
+
+Uitvoer:
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+   - <channel>
+       - <order>
+           <order_id>123456</order_id>
+           <command>identity_list</command>
+           <status_code>XMLOK 22</status_code>
+           <status_description>In DETAILS vind u de uitgebreide informatie</status_description>
+           <price>0.00</price>
+           - <details>
+               <identities_total>100</identities_total>
+               <identities_found>2</identities_found>
+               - <identity>
+                    <handle>ABCD123456</handle>
+                    <company_name>bedrijfsnaam1</company_name>
+                    <name>Achternaam, voornaam</name>
+               </ identity >
+               - < identity >
+                    <handle>ABCD654321</handle>
+                    <company_name>bedrijfsnaam1.</company_name>
+                    <name>Achternaam, voornaam</name>
+               </ identity >
+           </details>
+           <order_complete>TRUE</order_complete>
+           <done>TRUE</done>
+       </order>
+   </channel>
+
+
+
+## IDENTITY_UPD ##
+
+Beschrijving:
+Dit commando werkt de waarden van de attributen van een identity bij.
+
+Let op: wijzigingen die van invloed zijn op het formele eigendom van een domeinnaam worden opgevat als een
+domeinnaam overdracht. Hierom is het niet mogelijk middels het commando IDENTITY_UPD de attributen
+FIRSTNAME, LASTNAME, COMPANY en COMPANY_NAME te wijzigen. Aanpassingen in deze gegevens kunnen
+alleen worden volbracht door een nieuw profiel aan te maken en het commando DOMAIN_UPD te voltooien.
+
+Variabelen:
+    -   IDENTITY (verplicht)   Handle ID
+    -   Zie commando identity_add voor volledige beschrijving van de variabelen.
+
+Indien u een parameter niet opgeeft en deze niet verplicht is worden de waarden geleegd. Afhankelijk van het
+land kunnen de verplichte velden anders zijn.
+
+Voorbeeld:
+https://api.oxxa.com/command.php?apiuser=USER&PASS=PASS&command=identity_upd&
+identity=ABCD123456&street=STRAAT&number=66&postalcode=1234AB&city=WOONPLAATS&state=NB&co
+untry=NL&tel=0123456789&email=ADRES@EXAMPLE.ORG
+
+Uitvoer:
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+   - <channel>
+       - <order>
+           <order_id>123456</order_id>
+           <command>identity_upd</command>
+           <status_code>XMLOK 8</status_code>
+           <status_description>Identity is succesvol aangepast</status_description>
+           <price>0.00</price>
+           <details>ABCD123456</details>
+           <order_complete>TRUE</order_complete>
+           <done>TRUE</done>
+       </order>
+   </channel>
+
+
+
+## LOCK ##
+
+Beschrijving:
+Dit commando wijzigt de LOCK waarde van een domeinnaam.
+
+Variabelen:
+    -   SLD                       (verplicht)   Sld van de domeinnaam.
+    -   TLD                       (verplicht)   Tld van de domeinnaam.
+    -   LOCK                      (verplicht)   Nieuwe LOCK waarde (Y of N).
+
+Voorbeeld:
+https://api.oxxa.com/command.php?apiuser=USER&apipassword=PASS&command=lock&sld=EXAMPLE&
+tld=ORG&lock=N
+
+Uitvoer:
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+   - <channel>
+       - <order>
+           <order_id>123456</order_id>
+           <command>lock</command>
+           <sld>example</sld>
+           <tld>org</tld>
+           <status_code>XMLOK 3</status_code>
+           <status_description>Lock voor dit domein is aangepast</status_description>
+           <price>0.00</price>
+           <details>Lock aangepast naar: N</details>
+           <order_complete>TRUE</order_complete>
+           <done>TRUE</done>
+       </order>
+   </channel>
+
+
+
+## NSGROUP_ADD ##
+
+Beschrijving:
+Dit commando voegt een nameservergroep toe aan het systeem.
+
+Variabelen:
+    -   ALIAS                     (verplicht)   Naam van de nameservergroep.
+    -   NS1_FQDN                  (verplicht)   FQDN van de 1e nameserver (Fully Qualified Domain Name).
+    -   NS2_FQDN                  (verplicht)   FQDN van de 2e nameserver (Fully Qualified Domain Name).
+    -   NS3_FQDN                  (optioneel)   FQDN van de 3e nameserver (Fully Qualified Domain Name).
+    -   NS4_FQDN                  (optioneel)   FQDN van de 4e nameserver (Fully Qualified Domain Name).
+    -   NS5_FQDN                  (optioneel)   FQDN van de 5e nameserver (Fully Qualified Domain Name).
+    -   NS6_FQDN                  (optioneel)   FQDN van de 6e nameserver (Fully Qualified Domain Name).
+
+Voorbeeld:
+https://api.oxxa.com//command.php?apiuser=USER&apipassword=PASS&command=nsgroup_add&
+alias=NSGROUPNAME&ns1_fqdn=NS1.EXAMPLE.ORG&ns2_fqdn= NS2.EXAMPLE.ORG
+
+Uitvoer:
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+   - <channel>
+       - <order>
+           <order_id>123456</order_id>
+           <command>nsgroup_add</command>
+           <status_code>XMLOK 4</status_code>
+           <status_description>
+              De nameservergroep is succesvol aangemaakt, de handle vind u in de details
+           </status_description>
+           <price>0.00</price>
+           <details>EFGH1234</details>
+           <order_complete>TRUE</order_complete>
+           <done>TRUE</done>
+       </order>
+   </channel>
+
+
+
+## NSGROUP_DEL ##
+
+Beschrijving:
+Dit commando verwijdert een NSGROUP uit het systeem. Er kunnen hier geen nieuwe domeinen mee
+aangevraagd worden; domeinen die reeds gebruik maken van deze NSGROUP blijven ongewijzigd.
+
+Variabelen:
+    -   NSGROUP                   (verplicht)   Handle van de te verwijderen nameserver groep.
+
+Voorbeeld:
+https://api.oxxa.com//command.php?apiuser=USER&apipassword=PASS&command=nsgroup_del&
+nsgroup=DEFG456789
+
+Uitvoer:
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+   - <channel>
+       - <order>
+           <order_id>123456</order_id>
+           <command>nsgroup_del</command>
+           <status_code>XMLOK 5</status_code>
+           <status_description>Nameserver group succesvol verwijdert</status_description>
+           <price>0.00</price>
+           <details>YTZJ779672</details>
+           <order_complete>TRUE</order_complete>
+           <done>TRUE</done>
+       </order>
+   </channel>
+
+
+
+## NSGROUP_GET ##
+
+Omschrijving:
+Dit commando geeft de waarden van alle attributen van een NSGROUP.
+
+Variabelen:
+    -   NSGROUP                   (verplicht)   Handle van de nameserver groep.
+
+Voorbeeld:
+https://api.oxxa.com/command.php?apiuser=USER&apipassword=PASS&command=nsgroup_get&
+nsgroup=DEFG456789
+
+Uitvoer:
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+   - <channel>
+       - <order>
+           <order_id>123456</order_id>
+           <command>nsgroup_get</command>
+           <status_code>XMLOK 25</status_code>
+           <status_description>De uitgebreide gegevens vind u in DETAILS</status_description>
+           <price>0.00</price>
+           - <details>
+               <ns1_fqdn>ns1.example.org</ns1_fqdn>
+               <ns2_fqdn>ns2.example.org</ns2_fqdn>
+           </details>
+           <order_complete>TRUE</order_complete>
+           <done>TRUE</done>
+       </order>
+   </channel>
+
+
+
+## NSGROUP_LIST ##
+
+Beschrijving:
+Dit commando geeft een lijst van alle nameserver groepen. Diverse zoekfunctionaliteiten zijn beschikbaar.
+
+Variabelen:
+    -   SORTNAME                  (optioneel)   Veld waarop gesorteerd moet worden.
+    -   SORTORDER                 (optioneel)   Sorteervolgorde (ASC of DESC).
+    -   NSGROUP                   (optioneel)   Zoekwaarde voor de nsgroup handle.
+    -   GLOBAL_SEARCH             (optioneel)   Zoekwaarde voor alle velden.
+    -   ALIAS                     (optioneel)   Zoekwaarde voor de naam.
+    -   START                     (optioneel)   Bij welk veld moet worden begonnen met weergave (standaard: 0).
+    -   RECORDS                   (optioneel)   Hoeveel records moeten er worden weergegeven
+                                                (standaard: 25, -1 is alles).
+
+Voorbeeld:
+https://api.oxxa.com/command.php?apiuser=USER&apipassword=PASS&command=nsgroup_list
+
+Uitvoer:
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+   - <channel>
+       - <order>
+           <order_id>123456</order_id>
+           <command>nsgroup_list</command>
+           <status_code>XMLOK 24</status_code>
+           <status_description>In DETAILS vind u de uitgebreide informatie</status_description>
+           <price>0.00</price>
+           - <details>
+               <nsgroups_total>5</nsgroups_total>
+               <nsgroups_found>51</nsgroups_found>
+               - <nsgroup>
+                   <handle>EFGH1234</handle>
+                   <name>NS1</name>
+               </nsgroup>
+               - <nsgroup>
+                   <handle>EFGH1234</handle>
+                   <name> NS2</name>
+               </nsgroup>
+               - <nsgroup>
+                   <handle>EFGH1234</handle>
+                   <name> NS3</name>
+               </nsgroup>
+               - <nsgroup>
+                   <handle>EFGH1234</handle>
+                   <name> NS4</name>
+               </nsgroup>
+               - <nsgroup>
+                   <handle>EFGH1234</handle>
+                   <name> NS5</name>
+               </nsgroup>
+           </details>
+           <order_complete>TRUE</order_complete>
+           <done>TRUE</done>
+       </order>
+   </channel>
+
+Versie datum: 11-3-2021 9:43:10
+                                  61
+
+## NSGROUP_UPD ##
+
+Beschrijving:
+Dit commando werkt de waarden van de attributen van een NSGROUP bij. De mutaties worden doorgevoerd
+op alle domeinen die gebruik maken van het profiel.
+
+Variabelen:
+    -   NSGROUP                   (verplicht)   Handle van de nameserver groep.
+    -   ALIAS                     (optioneel)   Naam van de nameservergroep.
+    -   NS1_FQDN                  (optioneel)   FQDN van de 1e nameserver (Fully Qualified Domain Name).
+    -   NS2_FQDN                  (optioneel)   FQDN van de 2e nameserver (Fully Qualified Domain Name).
+    -   NS3_FQDN                  (optioneel)   FQDN van de 3e nameserver (Fully Qualified Domain Name).
+    -   NS4_FQDN                  (optioneel)   FQDN van de 4e nameserver (Fully Qualified Domain Name).
+    -   NS5_FQDN                  (optioneel)   FQDN van de 5e nameserver (Fully Qualified Domain Name).
+    -   NS6_FQDN                  (optioneel)   FQDN van de 6e nameserver (Fully Qualified Domain Name).
+
+Voorbeeld:
+https://api.oxxa.com/command.php?apiuser=USER&apipassword=PASS&command=nsgroup_upd&
+ns1_fqdn=NS1.EXAMPLE.ORG&ns2_fqdn= NS2.EXAMPLE.ORG &name=NIEUWENAAM&nsgroup=EFGH1234
+
+Uitvoer:
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+   - <channel>
+       - <order>
+           <order_id>123456</order_id>
+           <command>nsgroup_upd</command>
+           <status_code>XMLOK 6</status_code>
+           <status_description>De nameserver is succesvol aangepast</status_description>
+           <price>0.00</price>
+           <details>EFGH1234</details>
+           <order_complete>TRUE</order_complete>
+           <done>TRUE</done>
+       </order>
+   </channel>
+
+
+
+## ORDER_LIST ##
+
+Beschrijving:
+Dit commando geeft een lijst van orders. Diverse zoekfunctionaliteiten zijn beschikbaar.
+
+Als je de status van de FOA wilt weten gebruik dan het veld FOA, deze kan de volgende waarde bevatten:
+     -    Y = FOA kan opnieuw verzonden worden, zie commando FOARESEND
+     -    N = geen lopende FOA
+     -    D = FOA reeds afgerond
+
+Variabelen:
+    -   START                     (optioneel)   Startveld van de lijstweergave (standaard = 0).
+    -   RECORDS                   (optioneel)   Maximaal te tonen records in lijstweergave (standaard = 25, bij een
+                                                waarde van -1 wordt de volledige lijst getoond).
+      -      SORTNAME             (optioneel)   Veld waarop de lijstweergave gesorteerd wordt.
+      -      SORTORDER            (optioneel)   Sorteervolgorde aflopend of oplopend (ASC / DESC).
+      -      ORDER_ID             (optioneel)   Geeft een zoekstring op voor de orders_is.
+      -      SLD                  (optioneel)   Zoekvoorwaarde voor de SLD.
+      -      TLD                  (optioneel)   Zoekvoorwaarde voor de TLD.
+      -      STATUS               (optioneel)   Zoekvoorwaarde voor status: (E)rror, (P)ending, (S)uccess.
+                                                (standaard = A)
+      -      TYPE                 (optioneel)   Transfer / register.
+
+Voorbeeld:
+https://api.oxxa.com//command.php?apiuser=USER&apipassword=PASS&command=order_list&status=P&
+type=TRANSFER&sortname=SLD&sortorder=ASC
+
+Uitvoer:
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+   - <channel>
+       - <order>
+           <order_id>123456</order_id>
+           <command>order_list</command>
+           <status_code>XMLOK18</status_code>
+           <status_description>In DETAILS vind u de uitgebreide informatie</status_description>
+           <price>0</price>
+           - <details>
+               <domains_total>1234</domains_total>
+               <domains_found>1</domains_found>
+               - <domain>
+                   <orders_id>123456</orders_id>
+                   <sld>example1</sld>
+                   <tld>org</tld>
+                   <status>transfer</status>
+                   <type>pending</type>
+                   <foa>Y</foa>
+                   <description>
+                       Oude eigenaar heeft niet op de mail geantwoord, een fax is vereist.
+                   </description>
+                   <date_created>2009-01-26 11:37:29</date_created>
+               </domain>
+           </details>
+           <order_complete>TRUE</order_complete>
+           <done>TRUE</done>
+       </order>
+   </channel>
+## PRICECHECK ##
+
+Omschrijving:
+Dit commando geeft het tarief voor een gegeven API commando en een gegeven TLD.
+
+Variabelen:
+    -   TLD                       (verplicht)   Tld waarvan de prijs moet worden opgevraagd.
+    -   COMMANDNAME               (optioneel)       Naam van commando, indien niet opgegeven, alle
+        commando’s.
+
+Voorbeeld:
+https://api.oxxa.com/command.php?apiuser=USER&apipassword=PASS&command=pricecheck&tld=ORG&
+commandname=TRANSFER
+
+Uitvoer:
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+   - <channel>
+       - <order>
+           <order_id>123456</order_id>
+           <command>pricecheck</command>
+           <tld>org</tld>
+           <status_code>XMLOK 27</status_code>
+           <status_description>De prijs vind u in de details</status_description>
+           <price>0.00</price>
+           - <details>
+               - <id1>
+                   <commandname>transfer</commandname>
+                   <tld>org</tld>
+                   <price>0.00</price>
+                   <period>1</period>
+                   <currency>EUR</ currency>
+               </id1>
+           </details>
+           <order_complete>TRUE</order_complete>
+           <done>TRUE</done>
+       </order>
+   </channel>
+
+
+
+## QUEUE_GET ##
+
+Omschrijving:
+Dit commando geeft de details van een queue item weer.
+
+Variabelen:
+    -   QUEUE_ID                  (verplicht)   Het queue_id van het op te vragen item.
+
+Voorbeeld:
+https://api.oxxa.com/command.php?apiuser=USER&apipassword=PASS&command=queue_get&queue_id=1
+
+Uitvoer:
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+   - <channel>
+       - <order>
+           <order_id>123456</order_id>
+           <command>cart_get</command>
+           <status_code>XMLOK 49</status_code>
+           <status_description>De informatie vind u in DETAILS</status_description>
+           <price>0</price>
+           - <details>
+               <sld>example</sld>
+               <tld>org</tld>
+               <command>register</command>
+               <amount>1</amount>
+               <identity-admin>ABCD1234</identity-admin>
+               <identity-tech> ABCD1234</identity-tech>
+               <identity-billing> ABCD1234</identity-billing>
+               <identity-registrant> ABCD1234</identity-registrant>
+               <identity-reseller>ABCD1234</identity-reseller>
+               <nsgroup>ABCD1234</nsgroup>
+               <template>ABCD1234</ template >
+               <trustee>N</trustee>
+               <epp></epp>
+               <autorenew>Y</autorenew>
+               <lock>Y</lock>
+               <execution_at>20-11-2018</ execution_at>
+           </details>
+           <order_complete>TRUE</order_complete>
+           <done>TRUE</done>
+       </order>
+   </channel>
+
+
+
+## QUEUE_LIST ##
+
+Omschrijving:
+Dit commando geeft de details van een queue item weer.
+
+Variabelen:
+    -   START                     (optioneel)   Om te bepalen om op te halen vanaf ID x.
+    -   RECORDS                   (optioneel)   Het aantal records dat opgehaald moet worden.
+
+Voorbeeld:
+https://api.oxxa.com/command.php?apiuser=USER&apipassword=PASS&command=queue_list&start=1&rec
+ords=50
+
+Uitvoer:
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+   - <channel>
+       - <order>
+           <order_id>123456</order_id>
+           <command>queue_list</command>
+           <status_code>XMLOK 132</status_code>
+           <status_description>De informatie vindt u in DETAILS</status_description>
+           <price/>
+           <details>
+              <queue_total>0</queue_total>
+              <queue_found>0</queue_found>
+           </details>
+           <order_complete>TRUE</order_complete>
+           <done>TRUE</done>
+       </order>
+   </channel>
+
+
+
+## QUEUE_UPD ##
+
+Omschrijving:
+Dit commando geeft de details van een queue item weer.
+
+Variabelen:
+    -   QUEUE_ID                  (verplicht)   Het queue_id van het op te vragen item.
+    -   EPP                       (optioneel)   Indien u de verhuiscode (EPP) wilt aanpassen.
+    -   EXECUTION_AT              (optioneel)   Indien u de uitvoerdatum wilt aanpassen. (DD-MM-YYYY)
+
+Voorbeeld:
+https://api.oxxa.com/command.php?apiuser=USER&apipassword=PASS&command=queue_upd&queue_id=
+1&epp=12345678&execution_at=20-01-2018
+
+Uitvoer:
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+   - <channel>
+       - <order>
+           <order_id>123456</order_id>
+           <command>queue_upd</command>
+           <status_code>XMLOK 608</status_code>
+           <status_description> Geplande registratie of verhuizing is gewijzigd.</status_description>
+           <price/>
+           <order_complete>TRUE</order_complete>
+           <done>TRUE</done>
+       </order>
+</channel>
+
+
+
+## QUEUE_DEL ##
+
+Omschrijving:
+Dit commando geeft de details van een queue item weer.
+
+Variabelen:
+    -   QUEUE_ID                  (verplicht)   Het queue_id van het item wat u wilt verwijderen.
+
+Voorbeeld:
+https://api.oxxa.com/command.php?apiuser=USER&apipassword=PASS&command=queue_del&queue_id=1
+
+Uitvoer:
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+   - <channel>
+       - <order>
+           <order_id>123456</order_id>
+           <command>queue_del</command>
+           <status_code>XMLOK 604</status_code>
+           <status_description> Geplande registratie of verhuizing is verwijderd.</status_description>
+           <price/>
+           <order_complete>TRUE</order_complete>
+           <done>TRUE</done>
+       </order>
+</channel>
+
+
+
+## REGISTER ##
+
+Beschrijving:
+Registreert een domeinnaam met de opgegeven identities en nsgroup. Vermelde prijs in dit commando is in
+euros.
+
+Variabelen:
+    -   IDENTITY-ADMIN            (verplicht)   Handle van admin identity.
+    -   IDENTITY-TECH             (optioneel)   Handle van tech identity.
+    -   IDENTITY-BILLING          (optioneel)   Handle van billing identity.
+    -   IDENTITY-REGISTRANT       (verplicht)   Handle van registrant identity.
+    -   IDENTITY-RESELLER         (optioneel)   Handle van een reseller (alleen voor .NL)
+    -   NSGROUP                   (verplicht)   Handle van de nameserver groep.
+    -   DNSTEMPLATE               (optioneel)   Handle van een template wanneer voor managed dns
+    -   SLD                       (verplicht)   Sld van te registreren domein.
+    -   TLD                       (verplicht)   Tld van te registreren domein.
+    -   PERIOD                    (verplicht)   Registratieperiode in jaren.
+    -   AUTORENEW                 (verplicht)   Moet het domein op autorenew staan (Y of N).
+    -   LOCK                      (optioneel)   Moet het domein op LOCK staan (Y of N) (default: Y)
+    -   USETRUSTEE                (optioneel)   Moet de trustee service mee besteld worden
+    -   PREMIUM_PRICE             (optioneel)   Exacte premium prijs (enkel voor premium registraties)
+    -   EXECUTION_AT              (optioneel)   Datum waarop de order uitgevoerd wordt (DD-MM-YYYY)
+
+
+Voorbeeld:
+https://api.oxxa.com/command.php?apiuser=USER&apipassword=PASS&command=register&sld=EXAMPLE
+&tld=ORG&identity-admin=ABCD123456&identity-tech=ABCD123456&identity-billing=ABCD123456&
+nsgroup=EFGH1234&dnstemplate=EFGH1234&period=1&autorenew=Y&identity-
+registrant=ABCD123456&lock=Y
+
+Uitvoer:
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+   - <channel>
+       - <order>
+           <order_id>123456</order_id>
+           <command>register</command>
+           <sld>example</sld>
+           <tld>org</tld>
+           <status_code>XMLOK 1</status_code>
+           <status_description>Het domein is succesvol geregistreerd</status_description>
+           <price>7.20</price>
+           <order_complete>TRUE</order_complete>
+           <done>TRUE</done>
+       </order>
+   </channel>
+
+
+
+## REGISTER_STATUS ##
+
+Beschrijving:
+Dit commando geeft de status van een aanvraag.
+
+Variabelen:
+    -   SLD                       (verplicht)   Sld van het te controleren domein.
+    -   TLD                       (verplicht)   Tld van het te controleren domein.
+
+Voorbeeld:
+https://api.oxxa.com/command.php?apiuser=USER&apipassword=PASS&command=register_status&
+sld=EXAMPLE&tld=ORG
+
+Uitvoer:
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+   - <channel>
+       - <order>
+           <order_id>123456</order_id>
+           <command>register_status</command>
+           <sld>example</sld>
+           <tld>org</tld>
+           <status_code>XMLOK 1</status_code>
+           <status_description>Het domein is succesvol geregistreerd</status_description>
+           <price>0.00</price>
+           <order_complete>TRUE</order_complete>
+           <done>TRUE</done>
+       </order>
+   </channel>
+
+
+
+## RENEW ##
+
+Beschrijving:
+Dit commando voert een handmatige verlenging van een domeinnaam uit met een gegeven aantal jaren.
+Vermelde prijs in dit commando is in euros.
+
+Variabelen:
+    -   SLD                       (verplicht)   Sld van het domein.
+    -   TLD                       (verplicht)   Tld van het domein.
+    -   PERIOD                    (verplicht)   Aantal jaren van vernieuwing.
+
+Voorbeeld:
+https://api.oxxa.com/command.php?apiuser=USER&apipassword=PASS&command=renew&sld=EXAMPLE&
+tld=ORG&period=1
+
+Uitvoer:
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+   - <channel>
+       - <order>
+           <order_id>123456</order_id>
+           <command>renew</command>
+           <sld>example</sld>
+           <tld>org</tld>
+           <status_code>XMLOK 14</status_code>
+           <status_description>Renew_periode succesvol aangepast</status_description>
+           <price>7.20</price>
+           <order_complete>TRUE</order_complete>
+           <done>TRUE</done>
+       </order>
+   </channel>
+
+
+
+## RESELLERADD ##
+
+Beschrijving:
+Dit commando voegt een contact profiel aan het systeem toe welke gebruikt kan worden als reseller profiel.
+Deze informatie zal getoond worden als reseller in de WHOIS informatie van de SIDN (.NL).
+
+Variabelen:
+    -   ALIAS                     (verplicht)   Alias van de identity.
+    -   COMPANY                   (verplicht)   Bedrijfsnaam voor identity.
+    -   URL                       (optioneel)   Website van de reseller
+    -   FIRSTNAME                 (verplicht)   Voornaam voor identity.
+    -   LASTNAME                  (verplicht)   Achternaam voor identity.
+    -   STREET                    (verplicht)   Straatnaam voor identity.
+    -   NUMBER                    (verplicht)   Huisnummer voor identity.
+    -   SUFFIX                    (optioneel)   Toevoeging huisnummer voor identity.
+    -   POSTAL                    (verplicht)   Postcode voor identity.
+    -   CITY                      (verplicht)   Woonplaats voor identity.
+    -   TEL                       (verplicht)   Telefoonnummer voor identity.
+    -   EMAIL                     (verplicht)   E-mailadres voor identity.
+    -   COUNTRY                   (verplicht)   Landcode voor identity.
+
+Voorbeeld:
+https://api.oxxa.com/command.php?apiuser=USER&apipassword=PASS&command=reselleradd&
+&company_name=BEDRIJFSNAAM&url=URL&firstname=VOORNAAM&lastname=ACHTERNAAM&
+street=STRAAT&number=66&postal=POSTCODE&city=WOONPLAATS&country=NL&tel=0123456789&
+email=ADRES@EXAMPLE.ORG
+
+Uitvoer:
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+   - <channel>
+       - <order>
+           <order_id>123456</order_id>
+           <command>reselleradd</command>
+           <status_code>XMLOK 104</status_code>
+           <status_description>
+              Reseller profiel aangemaakt
+           </status_description>
+           <price>0.00</price>
+           <details>ABCD123456</details>
+           <order_complete>TRUE</order_complete>
+           <done>TRUE</done>
+       </order>
+   </channel>
+
+
+
+## RESELLERDEL ##
+
+Beschrijving:
+Dit commando verwijdert een aangemaakte reseller identity uit het systeem. De betreffende identity kan niet
+meer gebruikt worden voor nieuwe domeinen; domeinen die reeds gebruik maken van deze identity blijven
+ongewijzigd.
+
+Variabelen:
+    -   IDENTITY                  (verplicht)   Handle van de te verwijderen identity.
+
+Voorbeeld:
+https://api.oxxa.com//command.php?apiuser=USER&apipassword=PASS&command=resellerdel&
+identity=ABCD123456
+
+Uitvoer:
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+   - <channel>
+       - <order>
+           <order_id>123456</order_id>
+           <command>resellerdel</command>
+           <status_code>XMLOK 105</status_code>
+           <status_description>Reseller profiel verwijderd</status_description>
+           <price>0.00</price>
+           <details>ABCD123456</details>
+           <order_complete>TRUE</order_complete>
+           <done>TRUE</done>
+       </order>
+   </channel>
+
+
+
+## RESELLERGET ##
+
+Omschrijving:
+Dit commando geeft alle attributen van een bestaande reseller identity.
+
+Variabelen:
+    -   IDENTITY                  (verplicht)   De handle van de op te vragen identity.
+
+Voorbeeld:
+https://api.oxxa.com/command.php?apiuser=USER&apipassword=PASS&command=resellerget&
+identity=ABCD123456
+
+Uitvoer:
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+   - <channel>
+       - <order>
+           <order_id>123456</order_id>
+           <command>resellerget</command>
+           <status_code>XMLOK 23</status_code>
+           <status_description>De uitgebreide gegevens vind u in DETAILS</status_description>
+           <price>0.00</price>
+           - <details>
+               <company>Bedrijfsnaam</company>
+               <url>www.website.nl</url>
+               <firstname>A</firstname>
+               <lastname>Janssen</lastname>
+               <street>Adres</street>
+               <number>4</number>
+               <suffix />
+               <postal>1234AB</postal>
+               <city>STAD</city>
+               <tel>0123456789</tel>
+               <email>adres@example.org</email>
+               <country>NL</country>
+               <last_updated>07-08-2008 11:06 (d-m-y h:m)</last_updated>
+           </details>
+           <order_complete>TRUE</order_complete>
+           <done>TRUE</done>
+       </order>
+   </channel>
+
+
+
+## RESELLERLIST ##
+
+Beschrijving:
+Dit commando geeft een lijst met reseller identities. Diverse zoekfunctionaliteiten zijn beschikbaar.
+
+Variabelen:
+    -   HANDLE                    (optioneel)   Zoekwaarde voor de identity handle.
+    -   NAME                      (optioneel)   Zoekwaarde voor de naam.
+    -   COMPANY_NAME              (optioneel)   Zoekwaarde voor bedrijfsnaam.
+    -   ALIAS                     (optioneel)   Zoekwaarde voor de alias.
+    -   SORTNAME                  (optioneel)   Veld waarop gesorteerd moet worden.
+    -   SORTORDER                 (optioneel)   Sorteervolgorde (ASC of DESC).
+    -   START                     (optioneel)   Bij welk veld moet worden begonnen met weergave
+                                                (standaard: 0).
+      -      RECORDS              (optioneel)   Hoeveel records moeten er worden weergegeven
+                                                (standaard: 25, -1 is alles).
+
+Voorbeeld:
+https://api.oxxa.com/command.php?apiuser=USER&apipassword=PASS&command=resellerlist&
+sortname=NAME&sortorder=ASC&identity=A&name=A&company_name=A&records=2&start=0
+
+Uitvoer:
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+   - <channel>
+       - <order>
+           <order_id>123456</order_id>
+           <command>resellerlist</command>
+           <status_code>XMLOK 22</status_code>
+           <status_description>In DETAILS vind u de uitgebreide informatie</status_description>
+           <price>0.00</price>
+           - <details>
+               <identities_total>100</identities_total>
+               <identities_found>2</identities_found>
+               - <identity>
+                    <handle>ABCD123456</handle>
+                    <company_name>bedrijfsnaam1</company_name>
+                    <name>Achternaam, voornaam</name>
+               </ identity >
+               - < identity >
+                    <handle>ABCD654321</handle>
+                    <company_name>bedrijfsnaam1.</company_name>
+                    <name>Achternaam, voornaam</name>
+               </ identity >
+           </details>
+           <order_complete>TRUE</order_complete>
+           <done>TRUE</done>
+       </order>
+   </channel>
+
+
+
+## RESELLERUPD ##
+
+Beschrijving:
+Dit commando werkt de waarden van de attributen van een reseller identity bij.
+
+Variabelen:
+    -   Zie commando reselleradd voor volledige beschrijving van de variabelen.
+
+Voorbeeld:
+https://api.oxxa.com/command.php?apiuser=USER&PASS=PASS&command=identity_upd&
+identity=ABCD123456&street=STRAAT&number=66&postal=1234AB&city=WOONPLAATS&
+country=NL&tel=0123456789&email=ADRES@EXAMPLE.ORG
+
+Uitvoer:
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+   - <channel>
+       - <order>
+           <order_id>123456</order_id>
+           <command>identity_upd</command>
+           <status_code>XMLOK 106</status_code>
+           <status_description>Reseller profiel aangepast</status_description>
+           <price>0.00</price>
+           <details>ABCD123456</details>
+           <order_complete>TRUE</order_complete>
+           <done>TRUE</done>
+       </order>
+   </channel>
+
+
+
+## SERVER_CREATE ##
+
+Beschrijving:
+Met dit commando kun je een nieuwe server toevoegen voor de auto-validate en auto-install van een SSL-
+certificaat.
+
+Variabelen:
+    -   TYPE                 (verplicht)   Type control panel momenteel D = DirectADmin en S = SatServer.
+    -   NAME                 (verplicht)   Een naam om de server te omschrijven.
+    -   HOST                 (verplicht)   Hostname van de server (alleen verplicht voor DirectAdmin).
+    -   USERNAME             (verplicht)   Gebruikersnaam van de server / reseller of user.
+    -   PASSWORD             (verplicht)   Wachtwoord om mee in te loggen. Voor DirectAdmin kan dit ook
+        een login key met beperkte rechten zijn.
+
+Voorbeeld:
+https://api.oxxa.com/command.php?apiuser=USER&apipassword=PASS&command=server_create&
+type=TYPE&name=NAME&host=HOST&username=USERNAME&password=PASSWORD
+
+Uitvoer:
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+   - <channel>
+       - <order>
+           <order_id>123456</order_id>
+           <command>server_create</command>
+           <status_code>XMLOK 212</status_code>
+           <status_description> Server is aangemaakt </status_description>
+           <price>0.00</price>
+           - <details>2113B9D9-4779-4B4D-9314-A463A33620D5</details>
+           <order_complete>TRUE</order_complete>
+           <done>TRUE</done>
+       </order>
+   </channel>
+
+
+
+## SERVER_LIST ##
+
+Beschrijving:
+Met dit commando kun je overzicht generen met alle aangemaakt servers in je account.
+
+Variabelen:
+    -   SEARCH                    (optioneel)   Doorzoeken van alle servers.
+    -   PER_PAGE                  (optioneel)   Aantal resultaten per pagina.
+    -   PAGE                      (optioneel)   Pagina die je terug wil zien, verplicht in combinatie met
+        PER_PAGE.
+
+Voorbeeld:
+https://api.oxxa.com/command.php?apiuser=USER&apipassword=PASS&command=server_list&
+search=SEARCH&per_page=PER_PAGE&page=PAGE
+
+Uitvoer:
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+   - <channel>
+       - <order>
+           <order_id>123456</order_id>
+           <command>server_list</command>
+           <status_code>XMLOK 213</status_code>
+           <status_description> In de details vindt je een overzicht van al je servers.</status_description>
+           <price>0.00</price>
+           - <details>
+               - <server>
+                   <id>2113B9D9-4779-4B4D-9314-A463A33620D5</id>
+                   <type>D</type>
+                   <name>Server 1</name>
+                   <host>https://www.direct-admin.com:2222</host>
+                   <created_at>2021-01-01</created_at>
+               </server>
+            </details>
+           <order_complete>TRUE</order_complete>
+           <done>TRUE</done>
+       </order>
+   </channel>
+
+
+
+## SERVER_GET ##
+
+Beschrijving:
+Met dit commando kun je de informatie van een server ophalen.
+
+Variabelen:
+    -   SERVER_ID                 (verplicht)   ID van de server.
+
+Voorbeeld:
+https://api.oxxa.com/command.php?apiuser=USER&apipassword=PASS&command=server_get&
+server_id=SERVER_ID
+
+Uitvoer:
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+   - <channel>
+       - <order>
+           <order_id>123456</order_id>
+           <command>server_get</command>
+           <status_code>XMLOK 214</status_code>
+           <status_description> Server informatie opgehaald.</status_description>
+           <price>0.00</price>
+           - <details>
+               <id>2113B9D9-4779-4B4D-9314-A463A33620D5</id>
+               <type>D</type>
+               <name>Server 1</name>
+               <host>https://www.direct-admin.com:2222</host>
+               <username>mijnserver</username>
+           </details>
+           <order_complete>TRUE</order_complete>
+           <done>TRUE</done>
+       </order>
+   </channel>
+
+
+
+## SERVER_DELETE ##
+
+Beschrijving:
+Met dit commando kun je een server verwijderen.
+
+Variabelen:
+    -   SERVER_ID                 (verplicht)   ID van de server.
+
+Voorbeeld:
+https://api.oxxa.com/command.php?apiuser=USER&apipassword=PASS&command=server_delete&
+server_id=SERVER_ID
+
+Uitvoer:
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+   - <channel>
+       - <order>
+           <order_id>123456</order_id>
+           <command>server_get</command>
+           <status_code>XMLOK 215</status_code>
+           <status_description> De server is verwijderd.</status_description>
+           <price>0.00</price>
+           <order_complete>TRUE</order_complete>
+           <done>TRUE</done>
+       </order>
+   </channel>
+
+
+
+## SERVER_UPDATE ##
+
+Beschrijving:
+Met dit commando kun je een server aanpassen.
+
+Variabelen:
+    -   NAME                 (verplicht)   Een naam om de server te omschrijven.
+    -   HOST                 (verplicht)   Hostname van de server (alleen verplicht voor DirectAdmin).
+    -   USERNAME             (verplicht)   Gebruikersnaam van de server / reseller of user.
+    -   PASSWORD             (verplicht)   Wachtwoord om mee in te loggen. Voor DirectAdmin kan dit ook
+        een login key met beperkte rechten zijn.
+
+Voorbeeld:
+https://api.oxxa.com/command.php?apiuser=USER&apipassword=PASS&command=server_update&
+server_id=SERVER_ID
+
+Uitvoer:
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+   - <channel>
+       - <order>
+           <order_id>123456</order_id>
+           <command>server_update</command>
+           <status_code>XMLOK 217</status_code>
+           <status_description> Server is aangepast.</status_description>
+           <price>0.00</price>
+           <order_complete>TRUE</order_complete>
+           <done>TRUE</done>
+       </order>
+   </channel>
+
+
+
+## SSL_LIST ##
+
+Beschrijving:
+Met dit commando haal je alle SSL op die er in je account staan.
+
+Variabelen:
+    -   sslid               (optioneel)     Haal de data van één SSL op, wanneer niet opgegeven dan
+        worden alle SSL’s in je account opgehaald.
+
+Voorbeeld:
+https://api.oxxa.com/command.php?apiuser=USER&apipassword=PASS&command=ssl_list
+
+Uitvoer:
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+   - <channel>
+       - <order>
+           <order_id>123456</order_id>
+           <command>ssl_list</command>
+           <status_code>XMLOK 115</status_code>
+           <status_description>U vind de uitgebreide info in DETAILS</status_description>
+           <price>0</price>
+           - <details>
+               <ssl>
+                   <sslid>123</sslid>
+                   <product>1</product>
+                   <period>2</period>
+                   <ssl>Positive SSL</ssl>
+                   <identity-organisation>JASDJ12345 </identity-organisation>
+                   <identity-tech>JASDJ12345 </identity-tech>
+                   <identity-admin>JASDJ12345 </identity- admin>
+                   <autorenew>Y</autorenew>
+                   <domain>www.domain.nl</domain>
+                   <sans>www.site.nl.www.site2.nl</sans>
+                   <csr>CSR VAN SSL</csr>
+                   <start_date>2014-12-01</start_date>
+                   <end_date>2015-12-01</end_date>
+                   <status>Active</status>
+               </ssl>
+           </details>
+           <order_complete>TRUE</order_complete>
+           <done>TRUE</done>
+       </order>
+   </channel>
+
+     Wanneer het SSL nog pending is wordt extra validatie informatie meegegeven via onderstaande detail
+     response:
+
+     Wanneer file auth gekozen is.
+     <authentication>
+     <AuthFileContent></AuthFileContent>
+     <AuthFileName></AuthFileName>
+     </authentication>
+
+     Wanneer CNAME auth gekozen is.
+     <authentication>
+     <CNAMEAuthValue></CNAMEAuthValue>
+     <CNAMEAuthName></CNAMEAuthName>
+     </authentication>
+
+     Wanneer email auth gekozen is.
+     <authentication>
+     <ApproverEmail></ApproverEmail>
+     </authentication>
+
+
+
+## SSL_AUTORENEW ##
+
+Beschrijving:
+Met die commando kan je de autorenew aan of uit zetten. Wanneer de autorenew uit staan zal het SSL
+certificaat niet automatisch verlengd worden.
+
+Variabelen:
+    -   sslid                     (verplicht)   ID van de SSL op te halen met SSL_list.
+    -   autorenew                 (verplicht)   Autorenew optie Y of N
+
+Voorbeeld:
+https://api.oxxa.com/command.php?apiuser=USER&apipassword=PASS&command=ssl_autorenew&sslid=1
+234&autorenew=Y
+
+Uitvoer:
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+   - <channel>
+       - <order>
+           <order_id>123456</order_id>
+           <command>ssl_autorenew</command>
+           <status_code>XMLOK 120</status_code>
+           <status_description> De autorenew van het SSL certificaat is aangepast</status_description>
+           <price>0</price>
+           - <details></details>
+           <order_complete>TRUE</order_complete>
+           <done>TRUE</done>
+       </order>
+   </channel>
+
+
+
+## SSL_PRODUCT_LIST ##
+
+Beschrijving:
+Dit commando geeft een lijst terug met alle mogelijke aan te vragen SSL certificaten en hun configuratie.
+
+Voorbeeld:
+https://api.oxxa.com/command.php?apiuser=USER&apipassword=PASS&command=ssl_product_list
+
+Uitvoer:
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+   - <channel>
+       - <order>
+           <order_id>123456</order_id>
+           <command>ssl_product_list</command>
+           <status_code>XMLOK 115</status_code>
+           <status_description>U vind de uitgebreide info in DETAILS</status_description>
+           <price>0</price>
+           - <details>
+               <ssl>
+                   <ssl>
+                       <id>1</id>
+                       <name>Rapid SSL</name>
+                       <pricing>
+                          <period months=”12”>
+                              <price>6.950</price>
+                          </period>
+                          <period months=”24”>
+                              <price>12.950</price>
+                          </period>
+                       </pricing>
+                       <config>
+                          <type>DV</type>
+                          <wildcard>N</wildcard>
+                          <type>DV</type>
+                          <wildcard>N</wildcard>
+                          <price_extra_domain>N</price_extra_domain>
+                          <cname_auth>N</cname_auth>
+                          <warranty></warranty>
+                          <greenbar></greenbar>
+                          <vendor></vendor>
+                          <delivery_time></delivery_time>
+                       </config>
+                   </ssl>
+               </ssl>
+           </details>
+           <order_complete>TRUE</order_complete>
+           <done>TRUE</done>
+       </order>
+   </channel>
+
+
+
+## SSL_APPROVERLIST ##
+
+Beschrijving:
+Dit commando geeft een lijst met mogelijk validatie email adressen terug aan de hand van de meegegeven CSR.
+Voor het ophalen van de email adressen dient of een domein of een CSR meegegeven te worden.
+
+Variabelen:
+    -    ssl                      (verplicht)   Het product ID van de SSL (ophalen met ssl_product_list)
+    -    period                   (verplicht)   De aanvraag periode van het SSL in maanden
+    -    csr                      (optioneel)   De CSR van de SSL (base64encoded)
+    -    domain                   (optioneel)   Hoofd domain van het SSL
+
+Voorbeeld:
+https://api.oxxa.com/command.php?apiuser=USER&apipassword=PASS&command=ssl_approverlist&ssl=50
+&period=12&csr=CSR&domain=WEBSITE.NL
+
+Uitvoer:
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+   - <channel>
+       - <order>
+           <order_id>123456</order_id>
+           <command>ssl_approverlist</command>
+           <status_code>XMLOK 115</status_code>
+           <status_description>U vind de uitgebreide info in DETAILS</status_description>
+           <price>0</price>
+           - <details>
+               <approver>admin@domein.nl</approver>
+               <approver>webmaster@domein.nl</approver>
+               …
+           </details>
+           <order_complete>TRUE</order_complete>
+           <done>TRUE</done>
+       </order>
+   </channel>
+
+
+
+## SSL_STATUS ##
+
+Beschrijving:
+Dit commando geeft de status terug van een lopende SSL aanvraag.
+
+Variabelen:
+    -   sslid                     (verplicht)   ID van de lopende SSL aanvraag
+
+Voorbeeld:
+https://api.oxxa.com/command.php?apiuser=USER&apipassword=PASS&command=ssl_status&sslid=1234
+
+Uitvoer:
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+   - <channel>
+       - <order>
+           <order_id>123456</order_id>
+           <command>ssl_status</command>
+           <status_code>XMLOK 116</status_code>
+           <status_description> De aanvraag van de SSL is nog niet afgerond</status_description>
+           <price>0</price>
+           <details>Awaiting Validation (Full)</details>
+           <order_complete>TRUE</order_complete>
+           <done>TRUE</done>
+       </order>
+   </channel>
+
+De volgende response mogelijkheden zijn er:
+
+      1.     WF_AUTHORIZATION
+      2.     AUTHORIZATION_FAILED
+      3.     WF_DOMAIN_APPROVAL_ADDRESS
+      4.     WF_DOMAIN_APPROVAL
+      5.     WF_EXTERNAL_APPROVALS
+      6.     SECURITY_REVIEW_FAILED
+      7.     WF_MANUAL_VETTING
+      8.     WF_VETTING_REVIEW
+      9.     CERTGEN_FAILED
+      10.    AWAITING VALIDATION
+      11.    ISSUED
+      12.    VALID
+      13.    COMPLETE
+      14.    REPLACED
+      15.    REVOKED
+      16.    REJECTED
+      17.    EXPIRED
+
+
+
+## SSL_EXTENDED_STATUS ##
+
+Beschrijving:
+Dit commando geeft dezelfde status terug van een lopende SSL aanvraag als het commando SSL_STATUS
+aangevuld met de validatie status en stappen bij bijvoorbeeld Extended Validatie SSL-certificaten. Bij multi-
+domein SSL-certificaten wordt per domeinnaam (SAN) de status weergegeven.
+
+Variabelen:
+    -   sslid                     (verplicht)   ID van de lopende SSL aanvraag
+
+Voorbeeld:
+https://api.oxxa.com/command.php?apiuser=USER&apipassword=PASS&command=ssl_extended_status&ss
+lid=1234
+
+Uitvoer:
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+   - <channel>
+       - <order>
+           <order_id>123456</order_id>
+           <command>ssl_ extended _status</command>
+           <status_code>XMLOK 116</status_code>
+           <status_description> De aanvraag van de SSL is nog niet afgerond</status_description>
+           <price>0</price>
+           <details>Awaiting Validation (Full)</details>
+           <order_complete>TRUE</order_complete>
+           <done>TRUE</done>
+       </order>
+   </channel>
+
+De volgende response mogelijkheden zijn er:
+
+      18.    WF_AUTHORIZATION
+      19.    AUTHORIZATION_FAILED
+      20.    WF_DOMAIN_APPROVAL_ADDRESS
+      21.    WF_DOMAIN_APPROVAL
+      22.    WF_EXTERNAL_APPROVALS
+      23.    SECURITY_REVIEW_FAILED
+      24.    WF_MANUAL_VETTING
+      25.    WF_VETTING_REVIEW
+      26.    CERTGEN_FAILED
+      27.    AWAITING VALIDATION
+      28.    ISSUED
+      29.    VALID
+      30.    COMPLETE
+      31.    REPLACED
+      32.    REVOKED
+      33.    REJECTED
+      34.    EXPIRED
+
+
+
+## SSL_CANCEL ##
+
+Beschrijving:
+Dit commando geeft de mogelijkheid om aanvragen of nieuwe SSL-certificaten van ten hoogste 30 dagen oud.
+
+Variabelen:
+    -   sslid                     (verplicht)   ID van de lopende SSL aanvraag
+
+Voorbeeld:
+https://api.oxxa.com/command.php?apiuser=USER&apipassword=PASS&command=ssl_cancel &sslid=1234
+
+Uitvoer:
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+   - <channel>
+       - <order>
+           <order_id>123456</order_id>
+           <command>ssl_cancel</command>
+           <status_code>XMLOK 148</status_code>
+           <status_description> Het certificaat is geannuleerd.</status_description>
+           </price>
+           <order_complete>TRUE</order_complete>
+           <done>TRUE</done>
+       </order>
+   </channel>
+
+
+
+## SSL_NEW ##
+
+Beschrijving:
+Met dit commando kan je een nieuwe SSL aanvraag starten.
+
+Er is de mogelijkheid om een SSL te valideren via een approver email adres of via een file_auth. Bij validatie
+met de file_auth krijg je na aanvraag een bestandsnaam en inhoud voor het bestand welke je in de root van het
+domein moet zetten voor validatie dat het domein van jou is.
+
+Variabelen:
+    -   identity-organisation     (verplicht)   Houder contact gegevens van SSL
+    -   identity-admin            (verplicht)   Admin contact gegevens van de SSL
+    -   identity-tech             (verplicht)   Tech contact gegevens van SSL
+    -   ssl                       (verplicht)   Het ID van het SSL certificaat
+    -   period                    (verplicht)   De periode in maanden, uit te lezen via ssl_product_list
+    -   csr                       (verplicht)   De CSR van het SSL ceritficaat (base64encoded)
+    -   privatekey *              (optioneel)   De privatekey voor de installatie (base64encoded)
+    -   file_auth                 (optioneel)   Enkel verplicht wanneer geen approver opgegeven
+    -   approver                  (optioneel)   Enkel verplicht wanneer geen file_auth
+    -   sans                      (optioneel)   Komma geschieden lijst van extra SSL domeinen
+    -   autorenew                 (verplicht)   Autorenew aan of uit bij aanvraag SSL (waarde Y of N)
+    -   renewal_order             (optioneel)   Meenemen van resterende dagen oude SSL
+    -   cname_auth                (optioneel)   Wanneer je wilt valideren via CNAME
+    -   file_auth_https           (optioneel)   Wanneer je wilt valideren via file met HTTPS
+    -   renewal_order_ssl_id      (optioneel)   Met de bestaande gegevens een SSL verlengen.
+    -   client_server_id          (optioneel)   De server UUID voor de auto-validate en auto-install.
+
+* Deze wordt encrypted opgeslagen en 4 weken na installatie verwijderd uit ons systeem.
+
+Voorbeeld:
+https://api.oxxa.com/command.php?apiuser=USER&apipassword=PASS&command=ssl_new&identity-
+organisation=IDEN12345&identity-admin=IDEN12345&identity-
+tech=IDEN12345&ssl=123&period=12&csr=CSR&approver=admin@domain.nl&sans=website.nl,website2.nl&a
+utorenew=Y&file_auth=Y
+
+Voorbeeld:
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+   - <channel>
+       - <order>
+           <order_id>123456</order_id>
+           <command>ssl_new</command>
+           <status_code>XMLOK 119</status_code>
+           <status_description>SSL aanvraag is in behandeling.</status_description>
+           <price>0</price>
+           <details>
+              <sslid>12345</sslid>
+              <filename>validatie.txt</filename>
+              <filecontent>de content voor validatie.txt</filecontent>
+              <cnamevalue>de content voor DNS validatie</cnamevalue>
+           </details>
+           <order_complete>TRUE</order_complete>
+           <done>TRUE</done>
+       </order>
+   </channel>
+
+
+
+## SSL_REISSUE ##
+
+Beschrijving:
+Met dit commando kan je een her uitgifte aanvragen van je bestaande SSL certificaat. Op dit moment is het
+nog niet mogelijk om een multi SSL uit te breiden met extra SANS.
+
+Variabelen:
+    -   sslid                      (verplicht)   Het ID van het SSL certificaat
+    -   csr                        (verplicht)   De CSR van het SSL ceritficaat (base64encoded)
+    -   file_auth                  (optioneel)   Enkel verplicht wanneer geen approver opgegeven
+    -   approver                   (optioneel)   Enkel verplicht wanneer geen file_auth
+    -   cname_auth                 (optioneel)   Wanneer je wilt valideren via CNAME (Y/N)
+    -   file_auth_https            (optioneel)   Wanneer de site al een SSL heeft. (Y/N)
+
+Voorbeeld:
+https://api.oxxa.com/command.php?apiuser=USER&apipassword=PASS&command=ssl_reissue&sslid=123&
+csr=CSR&approver=admin@domain.nl&file_auth=Y
+
+Voorbeeld:
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+   - <channel>
+       - <order>
+           <order_id>123456</order_id>
+           <command>ssl_reissue</command>
+           <status_code>XMLOK 126</status_code>
+           <status_description> De SSL reissue van het SSL certificaat is in behandeling</status_description>
+           <price>0</price>
+           <details>
+              <sslid>12345</sslid>
+              <filename>validatie.txt</filename>
+              <filecontent>de content voor validatie.txt</filecontent>
+           </details>
+           <order_complete>TRUE</order_complete>
+           <done>TRUE</done>
+       </order>
+   </channel>
+
+
+
+## SSL_CHANGE_APPROVER ##
+
+Beschrijving:
+Met dit commando kan je een het approver adres aanpassen.
+
+Variabelen:
+    -   sslid                     (verplicht)   ID van de SSL aanvraag
+    -   approver                  (verplicht)   Het nieuwe approver adres
+
+Voorbeeld:
+https://api.oxxa.com/command.php?apiuser=USER&apipassword=PASS&command=ssl_change_approver
+&sslid=1234&approver=nieuw@domein.nl
+
+Voorbeeld:
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+   - <channel>
+       - <order>
+           <order_id>123456</order_id>
+           <command>ssl_change_approver</command>
+           <status_code>XMLOK 123</status_code>
+           <status_description> Het approver adres is gewijzigd.</status_description>
+           <price>0</price>
+           <order_complete>TRUE</order_complete>
+           <done>TRUE</done>
+       </order>
+   </channel>
+
+
+
+## SSL_DOWNLOAD ##
+
+Beschrijving:
+Met dit commando kan je het SSL certificaat downloaden. De response dien je te base64deconden en daarna
+op te slaan als een ZIP bestand,
+
+Variabelen:
+    -   sslid                     (verplicht)   ID van de SSL aanvraag
+
+Voorbeeld:
+https://api.oxxa.com/command.php?apiuser=USER&apipassword=PASS&command=ssl_download&sslid=12
+34
+Voorbeeld:
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+   - <channel>
+       - <order>
+           <order_id>123456</order_id>
+           <command>ssl_download</command>
+           <status_code>XMLOK 121</status_code>
+           <status_description> In het details veld vind je de SSL als base64 string in ZIP
+       formaat.</status_description>
+           <details>BASE64 gecodeerde string welke als ZIP opgeslagen dient te worden</details>
+           <price>0</price>
+           <order_complete>TRUE</order_complete>
+           <done>TRUE</done>
+       </order>
+   </channel>
+
+
+Simpel PHP voorbeeld downloaden SSL:
+
+header($_SERVER['SERVER_PROTOCOL'].' 200 OK');
+header("Content-Type: application/zip");
+header("Content-Transfer-Encoding: Binary");
+header("Content-Disposition: attachment; filename=ssl.zip");
+
+echo base64_decode(‘RESPONSE DOWNLOAD COMMANDO’);
+
+
+
+## SSL_RESEND_APPROVER ##
+
+Beschrijving:
+Her sturen van de approver email
+
+Variabelen:
+    -   sslid                     (verplicht)   ID van de SSL aanvraag
+
+Voorbeeld:
+https://api.oxxa.com/command.php?apiuser=USER&apipassword=PASS&command=ssl_resend_approve&ssl
+id=1234
+
+Voorbeeld:
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+   - <channel>
+       - <order>
+           <order_id>123456</order_id>
+           <command>ssl_resend_approver</command>
+           <status_code>XMLOK 122</status_code>
+           <status_description> Approver resend verzonden.</status_description>
+           <price>0</price>
+           <order_complete>TRUE</order_complete>
+           <done>TRUE</done>
+       </order>
+   </channel>
+
+
+
+## SSL_REVOKE ##
+
+Beschrijving:
+Intrekken van het SSL certificaat.
+
+Variabelen:
+    -   sslid                     (verplicht)   ID van de SSL aanvraag
+
+Voorbeeld:
+https://api.oxxa.com/command.php?apiuser=USER&apipassword=PASS&command=ssl_revoke&sslid=1234
+
+Voorbeeld:
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+   - <channel>
+       - <order>
+           <order_id>123456</order_id>
+           <command>ssl_revoke</command>
+           <status_code>XMLOK 125</status_code>
+           <status_description>De SSL revoke is uitgevoerd.</status_description>
+           <price>0</price>
+           <order_complete>TRUE</order_complete>
+           <done>TRUE</done>
+       </order>
+   </channel>
+
+
+
+## TASK_GET ##
+
+Beschrijving:
+Dit commando geeft de detail gegevens van een openstaande taak en, indien van toepassing, het HTML
+formulier om de taak af te handelen.
+
+Variabelen:
+    -   TASK_ID                   (verplicht)   ID nummer van de taak.
+
+Voorbeeld:
+https://api.oxxa.com/command.php?apiuser=USER&apipassword=PASS&command=task_get&task_id=999
+
+Uitvoer:
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+   - <channel>
+       - <order>
+           <order_id>123456</order_id>
+           <command>task_get</command>
+           <status_code>XMLOK 48</status_code>
+           <status_description>U vind de uitgebreide info in DETAILS</status_description>
+           <price>0</price>
+           - <details>
+               <sld>example</sld>
+               <tld>org</tld>
+               <description>3 werkdagen wachten op reactie</description>
+               <datetime>2009-01-15 23:30:11</datetime>
+               <type>form</type>
+               - <info>
+                   - <![CDATA[
+                       <form>HTML FORM</form>
+                   ]]>
+               </info>
+           </details>
+           <order_complete>TRUE</order_complete>
+           <done>TRUE</done>
+       </order>
+   </channel>
+
+
+
+## TASK_LIST ##
+
+Beschrijving:
+Dit commando geeft een lijst van alle openstaande taken.
+
+Variabelen:
+    -   START                     (optioneel)   Taken weergeven vanaf taak nummer...
+
+Voorbeeld:
+https://api.oxxa.com/command.php?apiuser=USER&apipassword=PASS&command=task_list
+
+Uitvoer:
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+   - <channel>
+       - <order>
+           <order_id>123456</order_id>
+           <command>task_list</command>
+           <status_code>XMLOK 22</status_code>
+           <status_description>In DETAILS vind u de uitgebreide informatie</status_description>
+           <price>0</price>
+           - <details>
+               <tasks_total>1</tasks_total>
+               - <task>
+                   <description>Verhuisformulieren insturen</description>
+                   <sld>example</sld>
+                   <tld>org</tld>
+                   <datetime>2008-11-14 13:29:52</datetime>
+                   - <![CDATA[
+                       <form>HTML FORM</form>
+                   ]]>
+               </task>
+           </details>
+           <order_complete>TRUE</order_complete>
+           <done>TRUE</done>
+       </order>
+   </channel>
+
+
+
+## TRANSFER ##
+
+Beschrijving:
+Dit commando initieert een domeinnaam verhuizing van een andere provider naar de user account. Vermelde
+prijs in dit commando is in euros.
+
+Variabelen:
+    -   SLD                       (verplicht)   Sld van het domein.
+    -   TLD                       (verplicht)   Tld van het domein.
+    -   TRANS_EPP                 (optioneel)   Eventuele authorisatiecode van het domein.
+    -   IDENTITY-ADMIN            (verplicht)   Handle van de admin identity.
+    -   IDENTITY-TECH             (optioneel)   Handle van de tech identity.
+    -   IDENTITY-BILLING          (optioneel)   Handle van de billing identity.
+    -   IDENTITY-REGISTRANT       (verplicht)   Handle van de registrant identity.
+    -   IDENTITY-RESELLER         (optioneel)   Handle van een reseller (alleen voor .NL)
+    -   NSGROUP                   (verplicht)   Handle van de nameserver groep.
+    -   PERIOD                    (verplicht)   Registratieperiode in jaren.
+    -   USETRUSTEE                (optioneel)   Moet de trustee service mee besteld worden
+    -   PREMIUM_PRICE             (optioneel)   Exacte premium prijs (enkel voor premium registraties)
+    -   EXECUTION_AT              (optioneel)   Datum waarop de order uitgevoerd wordt (DD-MM-YYYY)
+    -   AUTORENEW                 (optioneel)   Y of N. Default waarde bij niet opgeven parameter = Y.
+
+Voorbeeld:
+https://api.oxxa.com/command.php?apiuser=USER&apipassword=PASS&command=transfer&sld=EXAMPLE
+&tld=ORG&trans_epp=EPP_CODE&identity-admin=ABCD1234&identity-tech=ABCD1234&
+identity-billing=ABCD1234&nsgroup= EFGH1234&period=1&autorenew=Y&
+identity-registrant=ABCD1234&identity-reseller=ABCD1234
+
+
+Uitvoer:
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+   - <channel>
+       - <order>
+           <order_id>123456</order_id>
+           <command>transfer</command>
+           <sld>example</sld>
+           <tld>org</tld>
+           <status_code>XMLPEN 3</status_code>
+           <status_description>Domeinverhuizing is geïnitieerd</status_description>
+           <price>7.20</price>
+           <order_complete>TRUE</order_complete>
+           <done>TRUE</done>
+       </order>
+   </channel>
+
+
+
+## TRANSFER_STATUS ##
+
+Beschrijving:
+Dit commando geeft de status van geïnitieerde verhuizing.
+
+Variabelen:
+    -   SLD                       (verplicht)   Sld van het domein.
+    -   TLD                       (verplicht)   Tld van het domein.
+
+Voorbeeld:
+https://api.oxxa.com/command.php?apiuser=USER&apipassword=PASS&command=transfer_status&
+sld=EXAMPLE&tld=ORG
+
+Uitvoer:
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+   - <channel>
+       - <order>
+           <order_id>123456</order_id>
+           <command>transfer_status</command>
+           <sld>example</sld>
+           <tld>org</tld>
+           <status_code>XMLPEN 4</status_code>
+           <status_description>Transfer Pending - Awaiting Release by Current Registrar</status_description>
+           <price>0.00</price>
+           <order_complete>TRUE</order_complete>
+           <done>TRUE</done>
+       </order>
+   </channel>
+
+
+
+## USER_FUNDS ##
+
+Beschrijving:
+Dit commando geeft een credit overzicht van de onderliggende gebruiker.
+
+Variabelen:
+    -   USERNAME                  (optioneel)   Filter op gebruikersnaam.
+
+Voorbeeld:
+https://api.oxxa.com/command.php?apiuser=USER&apipassword=PASS&command=user_funds
+
+Uitvoer:
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+   - <channel>
+       - <order>
+           <order_id>123456</order_id>
+           <command>user_funds</command>
+           <status_code>XMLOK 44</status_code>
+           <status_description>
+               credits van onderliggende users opgevraagd, de gegevens vind u in de DETAILS
+           </status_description>
+           <price />
+           - <details>
+               - <user>
+                   <username>USER</username>
+                   <funds_total>9999.79</funds_total>
+                   <funds_reserved>150.00</funds_reserved>
+                   <funds_available>9849.79</funds_available>
+               </user>
+               - <user>
+                   <username>USER2</username>
+                   <funds_total>221.00</funds_total>
+                   <funds_reserved />
+                   <funds_available221</funds_available>
+               </user>
+           </details>
+           <order_complete>TRUE</order_complete>
+           <done>TRUE</done>
+       </order>
+   </channel>
+
+
+
+## USER_RESET ##
+
+Beschrijving:
+Dit commando maakt een nieuw wachtwoord aan voor de gebruiker en mailt deze naar het email adres van het
+gekoppelde profiel.
+
+Variabelen:
+    -   USERNAME                  (verplicht)   Gebruikersnaam van de gebruiker.
+
+Voorbeeld:
+https://api.oxxa.com/command.php?apiuser=USER&apipassword=PASS&command=user_reset&
+username=GEBRUIKERSNAAM
+
+Uitvoer:
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+   - <channel>
+       - <order>
+           <order_id>123456</order_id>
+           <command>user_reset</command>
+           <status_code>XMLOK 53</status_code>
+           <status_description>
+              Er is een nieuw wachtwoord verzonden naar het bij ons bekende e-mail adres
+           </status_description>
+           <price>0</price>
+           <order_complete>TRUE</order_complete>
+           <done>TRUE</done>
+       </order>
+   </channel>
+
+
+
+## USER_TLD_LIST ##
+
+Beschrijving:
+Dit commando geeft een lijst van toegestane TLD’s en overeenkomende toegestane commando’s. Hiermee kan
+ondermeer worden opgevraagd of bijvoorbeeld de verhuizing van een bepaalde TLD mogelijk is en of voor een
+verhuizing een EPP code vereist is.
+
+Met de variabel with_price kan je ook de prijs informatie per commando ophalen. Houdt er rekening mee dat
+dit de API call vertraagt.
+
+Naast deze gegevens geeft dit commando ook informatie over de vereiste contactprofielen en mogelijkheden
+van deze TLD, zoals DNSSEC.
+
+Variabelen:
+    -   WITH_PRICE                (optioneel)    Toont per TLD de prijs per commando (langzaam)
+    -   CONVERTED                 (optioneel)    Rekent prijzen om naar EUR
+    -   TLD                       (optioneel)    Toont één specifieke TLD
+
+Voorbeeld:
+https://api.oxxa.com/command.php?apiuser=USER&apipassword=PASS&command=user_tld_list&with_pric
+e=Y &converted=EUR
+
+Uitvoer:
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+   - <channel>
+       - <order>
+           <order_id>123456</order_id>
+           <command>user_tld_list</command>
+           <status_code>XMLOK 46</status_code>
+           <status_description>De lijst met TLD's is opgevraagd, u vind ze in de details</status_description>
+           <price>0</price>
+           - <details>
+           <abogado>
+               <register/>
+               <transfer>
+                   <lock>Y</lock>
+                   <epp>Y</epp>
+               </transfer>
+               <renew/>
+               <domain_restore/>
+               <registrant>Y</registrant>
+               <admin>Y</admin>
+               <billing>Y</billing>
+               <tech>Y</tech>
+               <dnssec>Y</dnssec>
+               <price>
+                   <register>127.07</register>
+                   <transfer>127.07</transfer>
+                   <renew>127.07</renew>
+                   <domain_restore>72.63</domain_restore>
+                   <currency>EUR</currency>
+               </price>
+           </abogado>
+           </details>
+           <order_complete>TRUE</order_complete>
+           <done>TRUE</done>
+        </order>
+     </channel>
+
+
+
+## OWNERCPENDING ##
+
+Beschrijving:
+Toont een lijst met alle lopende owner-c verificaties die nog gevalideerd moeten worden.
+
+Variabelen:
+    -   WITH_PRICE                (optioneel)   Toont per TLD de prijs per commando (langzaam)
+    -   CONVERTED                 (optioneel)   Rekent prijzen om naar EUR
+    -   TLD                       (optioneel)   Toont één specifieke TLD
+
+Voorbeeld:
+https://api.oxxa.com/command.php?apiuser=USER&apipassword=PASS&command=ownercpending
+
+Uitvoer:
+Uitvoer:
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+   - <channel>
+       - <order>
+           <order_id>123456</order_id>
+           <command>ownercpending</command>
+           <status_code>XMLOK 153</status_code>
+           <status_description>Lopende ownerc verificaties</status_description>
+           <price>0</price>
+           - <details>
+               <ownerc>
+                    <id>123456</id>
+                       <email>dummy@dummy.com</email>
+                       <send_date>2020-06-15 11:06:30</send_date>
+                       <reminded_date/>
+               </ownerc>
+               <ownerc>
+                    <id>789023</id>
+                       <email>dummy@dummy.com</email>
+                       <send_date>2020-06-15 11:06:30</send_date>
+                       <reminded_date/>
+               </ownerc>
+           </details>
+           <order_complete>TRUE</order_complete>
+           <done>TRUE</done>
+       </order>
+   </channel>
+
+
+
+## OWNERCRESEND ##
+
+Beschrijving:
+Dit commando maakt het mogelijk om een ownerc-verificatie opnieuw te versturen. Let op het is maar
+eenmaal per 6 uur mogelijk of een verificatie opnieuw te sturen.
+
+Variabelen:
+    -   id                        Het ID van de ownerc die je wilt her sturen.
+
+Voorbeeld:
+https://api.oxxa.com/command.php?apiuser=USER&apipassword=PASS&command=ownercresend&id=1234
+
+Uitvoer:
+Uitvoer:
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+   - <channel>
+       - <order>
+           <order_id>123456</order_id>
+           <command>ownercresend</command>
+           <status_code>XMLOK 108</status_code>
+           <status_description> Owner-c vertificatie opnieuw verzonden</status_description>
+           <price>0</price>
+           <order_complete>TRUE</order_complete>
+           <done>TRUE</done>
+       </order>
+   </channel>
+
+
+
