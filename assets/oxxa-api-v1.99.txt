@@ -392,7 +392,7 @@ en worden er geen daadwerkelijke orders tot registratie of verhuizing verwerkt.
 AUTORENEW
 
 Beschrijving:
-Met dit commando kan worden bepaald of een domeinnaam automatisch 30 dagen voor de afloopdatum
+Met dit commando kan worden bepaald of een domeinnaam 30 dagen voor de afloopdatum
 automatisch door het systeem wordt verlengd.
 
 Variabelen:
@@ -1195,8 +1195,8 @@ Uitvoer:
 ## DOMAIN_EPP ##
 
 Beschrijving:
-Dit commando zend de EPP code van een domein per email aan de registrant. In het veld details kunt u bij een
-aantal TLD gelijk de verhuiscode inzien. Dit is helaas niet mogelijk bij alle TLD’s en daarom worden deze per e-
+Dit commando zendt de EPP code van een domein per email aan de registrant. In het veld details kunt u bij een
+aantal TLD’s gelijk de verhuiscode inzien. Dit is helaas niet mogelijk bij alle TLD’s en daarom worden deze per e-
 mail verzonden.
 
 Variabelen:
@@ -1268,8 +1268,8 @@ Uitvoer:
        </order>
    </channel>
 
-* Let op, hoewel een TLD DNSSEC ondersteunt is het mogelijk dat niet alle domeinnamen met deze extensie
-ook de mogelijkheid hebben om DNSSEC doordat niet alle domeinnamen bij dezelfde registry zijn
+* Let op, indien een TLD DNSSEC ondersteunt is het desondanks mogelijk dat niet alle domeinnamen met deze extensie
+ook de mogelijkheid hebben om DNSSEC te beheren doordat niet alle domeinnamen bij dezelfde registry zijn
 geregistreerd. Neem contact op met Customer Support indien u DNSSEC wilt toepassen op dergelijke
 domeinnamen.
 
@@ -1278,7 +1278,7 @@ domeinnamen.
 ## DOMAIN_LIST ##
 
 Beschrijving:
-Dit commando geeft een lijst van domeinnamen die onder beheer van de gebruiker. Diverse zoek opties
+Dit commando geeft een lijst van domeinnamen die onder beheer zijn van de gebruiker. Diverse zoekopties
 behoren tot de mogelijkheden. Voor het veld transferd en deleted moet een Y meegegeven worden.
 
 Variabelen:
@@ -1424,7 +1424,7 @@ Uitvoer:
 ## DOMAIN_RESTORE ##
 
 Beschrijving:
-Dit commando hersteld een domeinnaam uit quarantaine.
+Dit commando herstelt een domeinnaam uit quarantaine.
 
 Variabelen:
     -   SLD                       (verplicht)   Sld van het domein.
@@ -1460,7 +1460,7 @@ velden zijn optioneel, maar er moet tenminste 1 wijziging worden doorgegeven.
 
 Let op: een wijziging van de IDENTITY-REGISTRANT wordt opgevat als een domeinnaam overdracht naar een
 nieuwe houder. Afhankelijk van de domeinnaam extensie kan de registry hiervoor kosten in rekening brengen
-welke worden doorberekend.
+die worden doorberekend.
 
 Variabelen:
     -   SLD                       (verplicht)   Sld van de domeinnaam die wordt aangepast.
@@ -2198,8 +2198,7 @@ Uitvoer:
        </order>
    </channel>
 
-Versie datum: 11-3-2021 9:43:10
-                                  61
+
 
 ## NSGROUP_UPD ##
 
