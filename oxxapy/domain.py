@@ -302,8 +302,12 @@ class OxxapyDomains(Manager):
 
         if nsgroup is not None:
             params['nsgroup'] = nsgroup
+
         if identity is not None:
-            params['identity'] = identity
+            from .identity import OxxapyIdentity
+            if not isinstance(identity, OxxapyIdentity):
+                raise TypeError('identity must be OxxapyIdentity type')
+            params['identity'] = identity.handle
 
         if autorenew is not None:
             assert autorenew in (True, False), autorenew

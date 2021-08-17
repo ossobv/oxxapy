@@ -66,8 +66,9 @@ Higher level interface, preferred:
 .. code-block:: python
 
     # Looping over filtered/searched results:
+    identity = api.identities.get('VQHQ99548')
     # BEWARE: domains.filter()/all() returns an iterable!
-    for dom in api.domains.filter(identity='VQHQ99548'):
+    for dom in api.domains.filter(identity=identity):
         autorenew = 'Y' if dom.autorenew else 'N'
         print(
             f'{dom.name:32s}  {autorenew}  {dom.reg_c}  {dom.admin_c}'
