@@ -81,6 +81,16 @@ def transfer_domain(api, domain, transfer_key, registrant, admin, tech,
     cart_purchase_obj = api.raw('cart_purchase', cart_id=cart_id)
     print(cart_purchase_obj)
 
+    assert cart_purchase_obj.status[0], cart_purchase_obj
+    if cart_purchase_obj.status[1] == 47:
+        # All success :)
+        pass
+    elif cart_purchase_obj.status[1] == 50:
+        # One or more failed. But we did only one. So it failed.
+        raise ValueError('transfer failed')
+    else:
+        raise NotImplementedError(cart_purchase_obj.status)
+
 
 def main():
     api = Oxxapy(os.environ['OXXAPY_USER'], os.environ['OXXAPY_PASS'])
