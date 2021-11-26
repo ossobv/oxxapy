@@ -100,7 +100,7 @@ And, how about listing all domains per owner:
 
     # Print them in groups:
     for regc, domains in domains_by_regcs.items():
-        print(regc._alias, ' #', regc.handle)
+        print(regc.alias, ' #', regc.handle)
         for domain in domains:
             print('-', domain.name)
         print()

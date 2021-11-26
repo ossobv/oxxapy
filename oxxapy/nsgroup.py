@@ -59,6 +59,10 @@ class OxxapyNsgroup:
     def handle(self):
         return self._handle
 
+    @property
+    def alias(self):
+        return self._alias
+
 
 class OxxapyNsgroups(Manager):
     "Unbound nameservergroup manager"

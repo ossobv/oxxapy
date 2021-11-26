@@ -67,6 +67,10 @@ class OxxapyIdentity:
         return self._handle
 
     @property
+    def alias(self):
+        return self._alias
+
+    @property
     def nameaddr(self):
         return '{} {} <{}>'.format(
             self._firstname, self._lastname, self._email)

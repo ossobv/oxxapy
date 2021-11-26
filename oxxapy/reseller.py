@@ -61,6 +61,10 @@ class OxxapyReseller:
     def handle(self):
         return self._handle
 
+    @property
+    def alias(self):
+        return self._alias
+
 
 class OxxapyResellerNone(OxxapyReseller):
     """
