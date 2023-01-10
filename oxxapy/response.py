@@ -127,10 +127,11 @@ class OxxapyResponse(_OxxapyXml):
         Return inner <order/> from outer <channel/> as OxxapyOrder
         """
         if self._root.tag == 'channel':
-            children = self._root.getchildren()
-            if len(children) == 1 and children[0].tag == 'order':
-                return OxxapyOrder(children[0], req=self.orig_req)
-        raise NotImplementedError()
+            for idx, child in enumerate(self._root):
+                if idx >= 1 or child.tag != 'order':
+                    raise NotImplementedError((idx, child, child.tag))
+            return OxxapyOrder(child, req=self.orig_req)
+        raise NotImplementedError((self._root, self._root.tag))
 
 
 class OxxapyOrder(_OxxapyXml):
